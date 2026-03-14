@@ -1,12 +1,6 @@
 import { Instagram, Facebook, Twitter, Youtube } from 'lucide-react';
-import { useAuthStore } from '../../stores/authStore';
 
-interface FooterProps {
-  onNavigate?: (page: string) => void;
-}
-
-export default function Footer({ onNavigate }: FooterProps) {
-  const { isAuthenticated } = useAuthStore();
+export default function Footer() {
   return (
     <footer className="bg-[#111110] text-white/55 px-4 md:px-8 lg:px-14 py-12 md:py-16 pb-6 md:pb-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-8 md:gap-10 lg:gap-14 mb-10 md:mb-14">

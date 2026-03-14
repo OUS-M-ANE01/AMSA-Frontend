@@ -3,14 +3,17 @@ export default function Loader() {
     <div className="fixed inset-0 bg-[#FAF9F7] flex items-center justify-center z-[9999]">
       <div className="flex flex-col items-center gap-6">
         {/* Logo animé */}
-        <div className="relative">
-          <div className="font-serif text-5xl font-semibold tracking-wider animate-pulse">
-            Eva<span className="text-[#8B7355]">Styl</span>
-          </div>
-          <p className="text-xs text-[#8B8680] tracking-[0.3em] text-center mt-2">
-            MODE & BIJOUX
-          </p>
-        </div>
+        <div className="relative flex flex-col items-center">
+  <img
+    src="/AMSA.png"
+    alt="AM'SA Logo"
+    className="h-18 object-contain"
+  />
+
+  <p className="text-xs text-[#8B8680] tracking-[0.3em] text-center mt-2">
+    MODE & BIJOUX
+  </p>
+</div>
 
         {/* Animation de chargement */}
         <div className="flex gap-2">

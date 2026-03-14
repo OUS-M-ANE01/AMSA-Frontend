@@ -131,7 +131,9 @@ function App() {
     if (typeof currentPage === 'string' && currentPage.startsWith('admin-')) {
       // Page de login admin sans layout
       if (currentPage === 'auth') {
-        return <Auth onNavigate={handleNavigate} />;
+        return (
+          <AuthModal onClose={() => handleNavigate('accueil')} onSuccess={() => handleNavigate('admin-dashboard')} />
+        );
       }
       
       // Autres pages admin avec layout
@@ -241,7 +243,6 @@ function App() {
       
       case 'profil':
         return <Profil />;
-        return <Profil onNavigate={handleNavigate} />;
       case 'checkout':
         return <Checkout onNavigate={(page) => handleNavigate(page)} />;
 
@@ -465,7 +466,7 @@ function App() {
       <Suspense fallback={<Loader />}>
         {renderPage()}
       </Suspense>
-      <Footer onNavigate={handleNavigate} />
+      <Footer />
     </div>
   );
 }

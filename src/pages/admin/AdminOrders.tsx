@@ -75,7 +75,7 @@ export default function AdminOrders() {
   const [stats, setStats] = useState<any>(null);
   // Pagination
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const limit = 10;
   const [totalOrders, setTotalOrders] = useState(0);
 
   const fetchOrders = useCallback(async () => {

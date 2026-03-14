@@ -15,8 +15,6 @@ interface JewelryProductsProps {
   favoriteItems?: number[];
 }
 
-const JEWELRY_KEYWORDS = ['collier', 'bijou', 'bague', 'bracelet', 'boucle', 'parure', 'pendentif', 'earring', 'necklace', 'ring', 'jewelry'];
-const isJewelry = (cat: string) => JEWELRY_KEYWORDS.some(kw => cat.toLowerCase().includes(kw));
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function JewelryProducts({ onNavigate }: JewelryProductsProps) {

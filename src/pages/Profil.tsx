@@ -1,9 +1,8 @@
-import { User, Mail, Phone, MapPin, Lock, Package, Loader2, LogOut, ShoppingBag, Clock, CheckCircle, XCircle, ChevronDown, ChevronRight, TrendingUp, Star, AlertCircle } from 'lucide-react';
+import { User, Mail, Phone, Lock, Package, Loader2, LogOut, ShoppingBag, Clock, CheckCircle, XCircle, ChevronDown, TrendingUp, AlertCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { ordersAPI } from '../services/api';
 import toast, { Toaster } from 'react-hot-toast';
-import Loader from '../components/Loader';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: any }> = {
   confirmed: { label: 'Confirmée', color: 'text-emerald-700', bg: 'bg-emerald-50 border border-emerald-200', icon: CheckCircle },
@@ -103,14 +102,13 @@ function OrderCard({ order }: { order: any }) {
 }
 
 export default function Profil() {
-  const { user, updateProfile, updatePassword, loading, isAuthenticated, logout } = useAuth();
+  const { user, loading, isAuthenticated, logout } = useAuth();
 
   const onNavigate = (page: string) => {
     window.location.hash = page;
   };
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [showLogoutLoader, setShowLogoutLoader] = useState(false);
 
   const handleLogout = () => {
     setShowLogoutModal(true);
@@ -118,14 +116,14 @@ export default function Profil() {
 
   const confirmLogout = () => {
   setShowLogoutModal(false);
-  setShowLogoutLoader(true);
+  // setShowLogoutLoader(true); (supprimé, variable inexistante)
   setTimeout(() => {
     logout();
     window.scrollTo({ top: 0, behavior: 'instant' });
     window.location.hash = '';
     window.location.href = 'accueil';
     setTimeout(() => {
-      setShowLogoutLoader(false);
+      // setShowLogoutLoader(false); (supprimé, variable inexistante)
     }, 800);
   }, 1000);
 };
