@@ -134,7 +134,7 @@ export const authAPI = {
     api.put('/auth/password', { currentPassword, newPassword }),
 
   toggleFavorite: (productId: string) =>
-    api.post(`/auth/favoris/${productId}`),
+    api.put(`/auth/favoris/${productId}`),
 };
 
 // ============= PRODUCTS =============
@@ -189,13 +189,12 @@ export const ordersAPI = {
       nom: string;
       adresse: string;
       ville: string;
-      codePostal: string;
       telephone: string;
     };
     paymentMethod: string;
   }) => api.post('/orders', data),
 
-  getMyOrders: () => api.get('/orders/myorders'),
+  getMyOrders: () => api.get('/orders/my-orders'),
 
   getById: (id: string) => api.get(`/orders/${id}`),
 
@@ -208,8 +207,36 @@ export const ordersAPI = {
   markAsPaid: (id: string) => api.put(`/orders/${id}/pay`),
 };
 
+// ============= PAYMENT (NabooPay) =============
+export const paymentAPI = {
+  /**
+   * Initie un paiement NabooPay.
+   * Retourne { checkoutUrl, orderId, nabooOrderId }
+   */
+  initNabooPay: (data: {
+    items: { productId: string; quantity: number; price: number; name: string; image: string }[];
+    shippingAddress: {
+      prenom: string; nom: string; adresse: string;
+      ville: string; telephone: string; email?: string;
+    };
+    paymentMethods: ('WAVE' | 'ORANGE_MONEY' | 'FREE_MONEY' | 'EXPRESSO')[];
+    deliveryCost: number;
+  }) => api.post<{ success: boolean; checkoutUrl: string; orderId: string; nabooOrderId: string }>(
+    '/payment/init', data
+  ),
+
+  /**
+   * Vérifie le statut d'une commande après retour depuis NabooPay.
+   */
+  verify: (orderId: string, nabooId: string) =>
+    api.get<{ success: boolean; paid: boolean; status?: string }>(
+      `/payment/verify/${orderId}`, { params: { naboo_id: nabooId } }
+    ),
+};
+
 // ============= ADMIN =============
 export const adminAPI = {
+    refundOrder: (orderId: string) => api.get(`/payment/refund/${orderId}`),
   getStats: () => api.get('/admin/stats'),
 
   getSalesData: (period: 'week' | 'month' | 'year') =>
@@ -227,18 +254,21 @@ export const adminAPI = {
 
   // Testimonials
   getTestimonials: () => api.get('/admin/testimonials'),
-  getActiveTestimonials: () => api.get('/admin/testimonials/active'),
+  getActiveTestimonials: () => api.get('/public/testimonials'),
   createTestimonial: (data: any) => api.post('/admin/testimonials', data),
   updateTestimonial: (id: string, data: any) => api.put(`/admin/testimonials/${id}`, data),
   deleteTestimonial: (id: string) => api.delete(`/admin/testimonials/${id}`),
 
   // Site Content
-  getContentBySection: (section: string) => api.get(`/admin/content/${section}`),
+  getContentBySection: (section: string) => api.get(`/public/content/${section}`),
   updateContentBySection: (section: string, data: any) => api.put(`/admin/content/${section}`, data),
 
   // Categories
   getCategories: () => api.get('/admin/categories'),
   updateCategory: (id: string, data: any) => api.put(`/admin/categories/${id}`, data),
+
+  // Notifications
+  getNotifications: () => api.get('/admin/notifications'),
 };
 
 export default api;

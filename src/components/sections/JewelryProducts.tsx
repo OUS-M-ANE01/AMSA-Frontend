@@ -1,6 +1,12 @@
+import { useState, useEffect, useMemo } from 'react';
 import { ArrowRight } from 'lucide-react';
 import ProductCard from '../ProductCard';
+import { productsAPI, adminAPI } from '../../services/api';
+import { adaptApiProduct } from '../../hooks/usePublicProducts';
+import { useCart } from '../../hooks/useCart';
+import { useFavorites } from '../../hooks/useFavorites';
 import { jewelryProducts } from '../../data/products';
+import type { Product } from '../../types';
 
 interface JewelryProductsProps {
   onNavigate: (page: string) => void;
@@ -9,12 +15,48 @@ interface JewelryProductsProps {
   favoriteItems?: number[];
 }
 
-export default function JewelryProducts({ 
-  onNavigate, 
-  onAddToCart, 
-  onToggleFavorite, 
-  favoriteItems = [] 
-}: JewelryProductsProps) {
+const JEWELRY_KEYWORDS = ['collier', 'bijou', 'bague', 'bracelet', 'boucle', 'parure', 'pendentif', 'earring', 'necklace', 'ring', 'jewelry'];
+const isJewelry = (cat: string) => JEWELRY_KEYWORDS.some(kw => cat.toLowerCase().includes(kw));
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default function JewelryProducts({ onNavigate }: JewelryProductsProps) {
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { addToCart } = useCart();
+  const { isFavorite, toggleFavorite } = useFavorites();
+
+  useEffect(() => {
+    Promise.all([
+      productsAPI.getAll({ limit: 100 }),
+      adminAPI.getContentBySection('featured_jewelry').catch(() => null),
+    ])
+      .then(([prodsRes, contentRes]) => {
+        const data = prodsRes.data?.data || prodsRes.data?.products || prodsRes.data || [];
+        const adapted = Array.isArray(data) ? data.map(adaptApiProduct) : [];
+        const pinnedIds: string[] = contentRes?.data?.data?.content?.pinnedIds || [];
+        if (pinnedIds.length > 0 && adapted.length > 0) {
+          const pinned = pinnedIds
+            .map(id => adapted.find(p => String(p._id || p.id) === id))
+            .filter(Boolean) as Product[];
+          setAllProducts(pinned.length > 0 ? pinned : adapted);
+        } else {
+          setAllProducts(adapted);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const products = useMemo(() => {
+    if (allProducts.length > 0) return allProducts.slice(0, 4);
+    return jewelryProducts;
+  }, [allProducts]);
+
+  const handleAddToCart = (productId: string | number) => {
+    const product = products.find(p => String(p._id || p.id) === String(productId));
+    if (product) addToCart(product);
+  };
+
   return (
     <section id="bijoux" className="px-4 md:px-8 lg:px-14 py-16 md:py-24">
       <div>
@@ -34,18 +76,30 @@ export default function JewelryProducts({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7">
-        {jewelryProducts.map(product => (
-          <ProductCard 
-            key={product.id} 
-            product={product}
-            onNavigate={onNavigate}
-            onAddToCart={onAddToCart}
-            onToggleFavorite={onToggleFavorite}
-            isFavorite={favoriteItems.includes(Number(product.id))}
-          />
-        ))}
-      </div>
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="animate-pulse">
+              <div className="bg-[#E8E0D5] aspect-[3/4] rounded-md mb-3" />
+              <div className="h-4 bg-[#E8E0D5] rounded w-3/4 mb-2" />
+              <div className="h-4 bg-[#E8E0D5] rounded w-1/2" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7">
+          {products.map(product => (
+            <ProductCard
+              key={String(product._id || product.id)}
+              product={product}
+              onNavigate={onNavigate}
+              onAddToCart={handleAddToCart}
+              onToggleFavorite={toggleFavorite}
+              isFavorite={isFavorite(product._id || product.id)}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

@@ -1,8 +1,8 @@
-# Frontend EvaStyl - Mode & Bijoux
+# Frontend ASMA - Mode & Bijoux
 
 ## 🎨 Vue d'ensemble
 
-Frontend React + TypeScript pour le site e-commerce EvaStyl avec panel d'administration intégré.
+Frontend React + TypeScript pour le site e-commerce ASMA avec panel d'administration intégré.
 
 ## 📦 Technologies
 
@@ -138,7 +138,7 @@ Pour accéder au panel d'administration :
 
 **Identifiants par défaut :**
 ```
-Email: admin@evastyl.com
+Email: admin@asma.com
 Mot de passe: Admin@123456
 ```
 
@@ -297,8 +297,8 @@ Ce projet utilise :
 
 ## 📄 License
 
-Propriété de EvaStyl © 2025
+Propriété de ASMA © 2025
 
 ---
 
-**Développé avec ❤️ pour EvaStyl**
+**Développé avec ❤️ pour ASMA**

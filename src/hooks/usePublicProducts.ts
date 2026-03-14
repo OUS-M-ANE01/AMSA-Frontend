@@ -12,7 +12,7 @@ export function adaptApiProduct(p: any): Product {
     _id: p._id,
     id: p._id,
     name: p.name,
-    brand: p.brand || 'EvaStyl',
+    brand: p.brand || 'ASMA',
     price: p.price,
     oldPrice: p.oldPrice,
     image: p.image || (p.images && p.images[0]) || '',

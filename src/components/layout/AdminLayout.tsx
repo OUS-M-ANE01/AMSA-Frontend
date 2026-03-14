@@ -1,22 +1,21 @@
-import { useState, memo } from 'react';
-import { 
-  LayoutDashboard, 
-  Package, 
-  ShoppingCart, 
-  Users, 
+import { useState, memo } from "react";
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  Users,
   LogOut,
   Menu,
   X,
   Settings,
-  MessageSquareQuote,
   FileText,
   Search,
   Home,
-  Tag
-} from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
-import toast from 'react-hot-toast';
-import { NotificationPanel } from '../admin/NotificationPanel';
+  Tag,
+} from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
+import toast from "react-hot-toast";
+import { NotificationPanel } from "../admin/NotificationPanel";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -30,17 +29,17 @@ function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutProps) {
   const { user, logout } = useAuth();
 
   const menuItems = [
-    { id: 'admin-dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'admin-products', label: 'Produits', icon: Package },
-    { id: 'admin-categories', label: 'Catégories', icon: Tag },
-    { id: 'admin-orders', label: 'Commandes', icon: ShoppingCart },
-    { id: 'admin-users', label: 'Utilisateurs', icon: Users },
-    { id: 'separator-1', label: 'separator', icon: null },
-    { id: 'admin-testimonials', label: 'Témoignages', icon: MessageSquareQuote },
-    { id: 'admin-content', label: 'Contenu Site', icon: FileText },
-    { id: 'separator-2', label: 'separator', icon: null },
-    { id: 'admin-settings', label: 'Paramètres', icon: Settings },
-    { id: 'back-to-site', label: 'Retour au site', icon: Home },
+    { id: "admin-dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "admin-products", label: "Produits", icon: Package },
+    { id: "admin-categories", label: "Catégories", icon: Tag },
+    { id: "admin-orders", label: "Commandes", icon: ShoppingCart },
+    { id: "admin-users", label: "Utilisateurs", icon: Users },
+    { id: "admin-notifications", label: "Notifications", icon: Settings },
+    { id: "separator-1", label: "separator", icon: null },
+    { id: "admin-content", label: "Contenu Site", icon: FileText },
+    { id: "separator-2", label: "separator", icon: null },
+    { id: "admin-settings", label: "Paramètres", icon: Settings },
+    { id: "back-to-site", label: "Retour au site", icon: Home },
   ];
 
   const handleLogout = () => {
@@ -49,9 +48,9 @@ function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutProps) {
 
   const confirmLogout = () => {
     logout();
-    toast.success('Vous êtes déconnecté avec succès');
+    toast.success("Vous êtes déconnecté avec succès");
     setShowLogoutModal(false);
-    onNavigate('accueil');
+    onNavigate("accueil");
   };
 
   return (
@@ -73,11 +72,11 @@ function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutProps) {
       )}
 
       {/* Sidebar - Fixed */}
-      <aside 
+      <aside
         className={`${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         } ${
-          sidebarOpen ? 'w-64' : 'lg:w-20 w-64'
+          sidebarOpen ? "w-64" : "lg:w-20 w-64"
         } fixed left-0 top-0 h-screen bg-[#3A3A3A] text-white transition-all duration-300 flex flex-col shadow-2xl z-50 overflow-hidden`}
       >
         {/* Logo */}
@@ -109,42 +108,51 @@ function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutProps) {
         {/* Navigation */}
         <nav className="flex-1 p-2.5 space-y-1">
           {menuItems.map((item) => {
-            if (item.label === 'separator') {
-              return <div key={item.id} className="h-px bg-[#6B6B6B]/30 my-1.5"></div>;
+            if (item.label === "separator") {
+              return (
+                <div
+                  key={item.id}
+                  className="h-px bg-[#6B6B6B]/30 my-1.5"
+                ></div>
+              );
             }
 
             const Icon = item.icon!;
             const isActive = currentPage === item.id;
-            const isBackButton = item.id === 'back-to-site';
-            
+            const isBackButton = item.id === "back-to-site";
+
             return (
               <button
                 key={item.id}
                 onClick={() => {
                   // "Retour au site" navigue vers accueil sans déconnecter
                   if (isBackButton) {
-                    onNavigate('accueil');
+                    onNavigate("accueil");
                   } else {
                     onNavigate(item.id);
                   }
                 }}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all group relative overflow-hidden ${
                   isBackButton
-                    ? 'text-[#E8E0D5] hover:bg-[#4A4A4A] hover:text-white border-t border-[#6B6B6B]/30 mt-auto'
+                    ? "text-[#E8E0D5] hover:bg-[#4A4A4A] hover:text-white border-t border-[#6B6B6B]/30 mt-auto"
                     : isActive
-                    ? 'bg-[#8B7355] text-white shadow-lg shadow-[#8B7355]/30'
-                    : 'text-[#E8E0D5] hover:bg-[#4A4A4A] hover:text-white'
+                      ? "bg-[#8B7355] text-white shadow-lg shadow-[#8B7355]/30"
+                      : "text-[#E8E0D5] hover:bg-[#4A4A4A] hover:text-white"
                 }`}
               >
-                <div className={`relative flex items-center justify-center w-9 h-9 rounded-lg transition-all ${
-                  isActive 
-                    ? 'bg-white/10' 
-                    : 'bg-[#4A4A4A]/30 group-hover:bg-[#6B6B6B]'
-                }`}>
+                <div
+                  className={`relative flex items-center justify-center w-9 h-9 rounded-lg transition-all ${
+                    isActive
+                      ? "bg-white/10"
+                      : "bg-[#4A4A4A]/30 group-hover:bg-[#6B6B6B]"
+                  }`}
+                >
                   <Icon size={18} className="flex-shrink-0 relative z-10" />
                 </div>
                 {sidebarOpen && (
-                  <span className="font-medium text-sm relative z-10">{item.label}</span>
+                  <span className="font-medium text-sm relative z-10">
+                    {item.label}
+                  </span>
                 )}
                 {isActive && !isBackButton && (
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full"></div>
@@ -163,13 +171,16 @@ function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutProps) {
               <div className="w-12 h-12 bg-[#FEF3C7] rounded-xl flex items-center justify-center">
                 <LogOut className="text-[#92400E]" size={24} />
               </div>
-              <h3 className="text-xl font-bold text-[#3A3A3A]">Confirmer la déconnexion</h3>
+              <h3 className="text-xl font-bold text-[#3A3A3A]">
+                Confirmer la déconnexion
+              </h3>
             </div>
-            
+
             <p className="text-[#6B6B6B] mb-6">
-              Êtes-vous sûr de vouloir vous déconnecter de votre session administrateur ?
+              Êtes-vous sûr de vouloir vous déconnecter de votre session
+              administrateur ?
             </p>
-            
+
             <div className="flex gap-3">
               <button
                 onClick={() => setShowLogoutModal(false)}
@@ -189,14 +200,19 @@ function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutProps) {
       )}
 
       {/* Main Content */}
-      <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'}`}>
+      <main
+        className={`flex-1 transition-all duration-300 ${sidebarOpen ? "lg:ml-64" : "lg:ml-20"}`}
+      >
         {/* Desktop Header - Fixed */}
         <header className="bg-white border-b border-[#E8E0D5] sticky top-0 z-40 shadow-sm">
           <div className="px-4 sm:px-6 py-3.5 flex items-center justify-between gap-2 sm:gap-4">
             {/* Left: Search Bar - Hidden on mobile */}
             <div className="hidden md:flex flex-1 max-w-xl">
               <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B6B6B]" size={18} />
+                <Search
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B6B6B]"
+                  size={18}
+                />
                 <input
                   type="text"
                   placeholder="Rechercher..."
@@ -231,7 +247,8 @@ function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutProps) {
                 <div className="relative">
                   <div className="w-9 h-9 sm:w-10 sm:h-10 bg-[#8B7355] rounded-xl flex items-center justify-center shadow-md">
                     <span className="text-xs sm:text-sm font-bold text-white">
-                      {user?.prenom?.[0]}{user?.nom?.[0]}
+                      {user?.prenom?.[0]}
+                      {user?.nom?.[0]}
                     </span>
                   </div>
                   <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#10B981] border-2 border-white rounded-full"></div>
@@ -246,17 +263,20 @@ function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutProps) {
                 onClick={handleLogout}
                 className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#3A3A3A] hover:bg-[#8B7355] text-white rounded-xl transition-all group shadow-md hover:shadow-lg"
               >
-                <LogOut size={16} className="group-hover:rotate-12 transition-transform" />
-                <span className="text-sm font-medium hidden sm:inline">Déconnexion</span>
+                <LogOut
+                  size={16}
+                  className="group-hover:rotate-12 transition-transform"
+                />
+                <span className="text-sm font-medium hidden sm:inline">
+                  Déconnexion
+                </span>
               </button>
             </div>
           </div>
         </header>
 
         {/* Content */}
-        <div className="min-h-screen">
-          {children}
-        </div>
+        <div className="min-h-screen">{children}</div>
       </main>
     </div>
   );

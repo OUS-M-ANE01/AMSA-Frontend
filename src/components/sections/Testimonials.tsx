@@ -1,9 +1,34 @@
 import { Star } from 'lucide-react';
-import { testimonials } from '../../data/products';
+import { testimonials as staticTestimonials } from '../../data/products';
 import { useState, useEffect } from 'react';
+import { adminAPI } from '../../services/api';
+
+type Testimonial = typeof staticTestimonials[0];
+
+const adaptTestimonial = (t: any): Testimonial => ({
+  id: t._id || t.id,
+  author: t.author || t.name || '',
+  text: t.text || t.comment || '',
+  rating: t.rating || 5,
+  avatar: t.avatar || t.image || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80',
+  role: t.role || t.position || '',
+});
 
 export default function Testimonials() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(staticTestimonials);
   const [currentIndex, setCurrentIndex] = useState(1);
+
+  useEffect(() => {
+    adminAPI.getActiveTestimonials()
+      .then(res => {
+        const data = res.data?.data || res.data || [];
+        const adapted = Array.isArray(data) && data.length > 0
+          ? data.map(adaptTestimonial)
+          : staticTestimonials;
+        setTestimonials(adapted);
+      })
+      .catch(() => {}); // keep static fallback
+  }, []);
 
   // Défilement automatique - change toutes les 4 secondes
   useEffect(() => {
@@ -33,7 +58,7 @@ export default function Testimonials() {
           Avis Clients
         </div>
         <h2 className="font-serif text-3xl md:text-4xl lg:text-[clamp(32px,4vw,52px)] font-light leading-tight text-charcoal">
-          Elles <em className="italic text-gold">Adorent</em> EvaStyl
+          Elles <em className="italic text-gold">Adorent</em> ASMA
         </h2>
       </div>
 

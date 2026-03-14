@@ -50,6 +50,8 @@ interface Settings {
     description: string;
     buttonText: string;
   };
+  notificationEmail?: string;
+  notificationPhone?: string;
 }
 
 export default function AdminSettings() {
@@ -118,6 +120,35 @@ export default function AdminSettings() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Centre de notifications */}
+                <div className="bg-white rounded-2xl p-6 border border-[#E8E0D5] shadow-sm">
+                  <h2 className="text-xl font-bold text-[#3A3A3A] mb-4 flex items-center gap-2">
+                    <Clock size={24} className="text-[#8B7355]" />
+                    Centre de notifications
+                  </h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-[#3A3A3A] mb-2">Notifications Email</label>
+                      <input
+                        type="email"
+                        value={settings?.notificationEmail || ''}
+                        onChange={(e) => setSettings({...settings, notificationEmail: e.target.value})}
+                        className="w-full px-4 py-2.5 border border-[#E8E0D5] rounded-xl focus:border-[#8B7355] focus:outline-none"
+                        placeholder="Email pour notifications"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#3A3A3A] mb-2">Notifications SMS</label>
+                      <input
+                        type="tel"
+                        value={settings?.notificationPhone || ''}
+                        onChange={(e) => setSettings({...settings, notificationPhone: e.target.value})}
+                        className="w-full px-4 py-2.5 border border-[#E8E0D5] rounded-xl focus:border-[#8B7355] focus:outline-none"
+                        placeholder="Téléphone pour notifications"
+                      />
+                    </div>
+                  </div>
+                </div>
         {/* Informations générales */}
         <div className="bg-white rounded-2xl p-6 border border-[#E8E0D5] shadow-sm">
           <h2 className="text-xl font-bold text-[#3A3A3A] mb-4 flex items-center gap-2">

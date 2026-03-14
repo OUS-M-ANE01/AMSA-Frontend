@@ -31,7 +31,7 @@ export default function Apropos() {
                 Notre <em className="italic text-gold">Histoire</em>
               </h2>
               <p className="text-text-light mb-4 leading-relaxed">
-                EvaStyl est née d'une passion pour la mode et les bijoux, dans un petit atelier du Marais à Paris. 
+                ASMA est née d'une passion pour la mode et les bijoux, dans un petit atelier du Marais à Paris. 
                 Ce qui a commencé comme un rêve est devenu une maison de création reconnue pour ses pièces élégantes 
                 et intemporelles.
               </p>
@@ -44,7 +44,7 @@ export default function Apropos() {
             <div className="relative">
               <img 
                 src="/eva-about.png" 
-                alt="Atelier EvaStyl" 
+                alt="Atelier ASMA" 
                 className="w-full aspect-[4/5] object-contain"
               />
             </div>

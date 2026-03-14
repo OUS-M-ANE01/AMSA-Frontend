@@ -1,43 +1,148 @@
-import { User, Mail, Phone, MapPin, Lock, Package, Loader2 } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Lock, Package, Loader2, LogOut, ShoppingBag, Clock, CheckCircle, XCircle, ChevronDown, ChevronRight, TrendingUp, Star, AlertCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { ordersAPI } from '../services/api';
 import toast, { Toaster } from 'react-hot-toast';
+import Loader from '../components/Loader';
+
+const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: any }> = {
+  confirmed: { label: 'Confirmée', color: 'text-emerald-700', bg: 'bg-emerald-50 border border-emerald-200', icon: CheckCircle },
+  pending:   { label: 'En attente', color: 'text-amber-700',  bg: 'bg-amber-50 border border-amber-200',   icon: Clock },
+  cancelled: { label: 'Annulée',   color: 'text-red-700',    bg: 'bg-red-50 border border-red-200',        icon: XCircle },
+  delivered: { label: 'Livrée',    color: 'text-blue-700',   bg: 'bg-blue-50 border border-blue-200',      icon: CheckCircle },
+};
+
+function StatCard({ icon: Icon, label, value, sub }: { icon: any; label: string; value: string | number; sub?: string }) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl bg-white border border-[#e8e2d9] p-5 shadow-sm hover:shadow-md transition-shadow group">
+      <div className="absolute top-0 right-0 w-20 h-20 bg-[#C9A84C]/5 rounded-full -translate-y-6 translate-x-6 group-hover:scale-150 transition-transform duration-500" />
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-xl bg-[#C9A84C]/10 flex items-center justify-center shrink-0">
+          <Icon size={18} className="text-[#C9A84C]" />
+        </div>
+        <div>
+          <p className="text-xs text-[#8B7355] uppercase tracking-widest font-medium mb-1">{label}</p>
+          <p className="text-2xl font-serif font-semibold text-[#2C2C2C]">{value}</p>
+          {sub && <p className="text-xs text-[#8B7355] mt-0.5">{sub}</p>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OrderCard({ order }: { order: any }) {
+  const [open, setOpen] = useState(false);
+  const status = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending;
+  const StatusIcon = status.icon;
+
+  return (
+    <div className="bg-white border border-[#e8e2d9] rounded-2xl overflow-hidden hover:border-[#C9A84C]/50 hover:shadow-md transition-all duration-300">
+      <div
+        className="flex items-center gap-4 p-4 cursor-pointer select-none"
+        onClick={() => setOpen(!open)}
+      >
+        {/* Order icon */}
+        <div className="w-10 h-10 rounded-xl bg-[#C9A84C]/10 flex items-center justify-center shrink-0">
+          <ShoppingBag size={18} className="text-[#C9A84C]" />
+        </div>
+
+        {/* Order info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="font-serif font-semibold text-[#2C2C2C] text-sm">
+              Commande #{order._id.slice(-6).toUpperCase()}
+            </p>
+            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${status.bg} ${status.color}`}>
+              <StatusIcon size={11} />
+              {status.label}
+            </span>
+          </div>
+          <p className="text-xs text-[#8B7355] mt-0.5">
+            {new Date(order.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+            {' · '}{order.items.length} article{order.items.length > 1 ? 's' : ''}
+          </p>
+        </div>
+
+        {/* Total */}
+        <div className="text-right shrink-0">
+          <p className="font-serif font-semibold text-[#C9A84C] text-sm">
+            {order.total ? order.total.toLocaleString('fr-FR') : '—'} FCFA
+          </p>
+        </div>
+
+        {/* Chevron */}
+        <div className={`transition-transform duration-200 shrink-0 ${open ? 'rotate-180' : ''}`}>
+          <ChevronDown size={16} className="text-[#8B7355]" />
+        </div>
+      </div>
+
+      {/* Expandable details */}
+      {open && (
+        <div className="border-t border-[#e8e2d9] bg-[#faf8f5] px-4 py-4">
+          <p className="text-xs uppercase tracking-widest text-[#8B7355] font-medium mb-3">Détail des articles</p>
+          <div className="space-y-2">
+            {order.items.map((item: any, idx: number) => (
+              <div key={idx} className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#C9A84C]" />
+                  <span className="text-[#2C2C2C] font-medium">{item.name}</span>
+                  <span className="text-[#8B7355] text-xs">×{item.quantity}</span>
+                </div>
+                <span className="text-[#2C2C2C] font-medium">{item.price.toLocaleString('fr-FR')} FCFA</span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 pt-3 border-t border-[#e8e2d9] flex justify-between items-center">
+            <span className="text-xs text-[#8B7355]">Total commande</span>
+            <span className="font-serif font-semibold text-[#C9A84C]">{order.total?.toLocaleString('fr-FR')} FCFA</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Profil() {
-  const { user, updateProfile, updatePassword, loading } = useAuth();
-  
-  const [formData, setFormData] = useState({
-    prenom: '',
-    nom: '',
-    telephone: '',
-    adresse: '',
-  });
+  const { user, updateProfile, updatePassword, loading, isAuthenticated, logout } = useAuth();
 
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-  });
+  const onNavigate = (page: string) => {
+    window.location.hash = page;
+  };
+
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showLogoutLoader, setShowLogoutLoader] = useState(false);
+
+  const handleLogout = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = () => {
+  setShowLogoutModal(false);
+  setShowLogoutLoader(true);
+  setTimeout(() => {
+    logout();
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    window.location.hash = '';
+    window.location.href = 'accueil';
+    setTimeout(() => {
+      setShowLogoutLoader(false);
+    }, 800);
+  }, 1000);
+};
 
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
-  const [savingProfile, setSavingProfile] = useState(false);
-  const [changingPassword, setChangingPassword] = useState(false);
+  const [activeTab, setActiveTab] = useState<'orders' | 'profile'>('orders');
 
-  // Charger les données utilisateur
   useEffect(() => {
-    if (user) {
-      setFormData({
-        prenom: user.prenom || '',
-        nom: user.nom || '',
-        telephone: user.telephone || '',
-        adresse: user.adresse || '',
-      });
+    if (!loading && !isAuthenticated) {
+      onNavigate('auth');
     }
-  }, [user]);
+    if (!loading && isAuthenticated && user?.role === 'admin') {
+      onNavigate('admin-dashboard');
+    }
+  }, [loading, isAuthenticated, user]);
 
-  // Charger les commandes
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -46,353 +151,273 @@ export default function Profil() {
           setOrders(response.data.data);
         }
       } catch (error) {
-        console.error('Erreur lors du chargement des commandes:', error);
+        toast.error('Erreur lors du chargement des commandes');
       } finally {
         setOrdersLoading(false);
       }
     };
-
-    if (user) {
-      fetchOrders();
-    }
+    if (user) fetchOrders();
   }, [user]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setPasswordData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.prenom || !formData.nom) {
-      toast.error('Le prénom et le nom sont requis');
-      return;
-    }
-
-    setSavingProfile(true);
-    
-    try {
-      await updateProfile(formData);
-      toast.success('Profil mis à jour avec succès');
-    } catch (error) {
-      // Error already handled by useAuth
-    } finally {
-      setSavingProfile(false);
-    }
-  };
-
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error('Les mots de passe ne correspondent pas');
-      return;
-    }
-
-    if (passwordData.newPassword.length < 6) {
-      toast.error('Le mot de passe doit contenir au moins 6 caractères');
-      return;
-    }
-
-    setChangingPassword(true);
-    
-    try {
-      await updatePassword(passwordData.currentPassword, passwordData.newPassword);
-      toast.success('Mot de passe modifié avec succès');
-      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    } catch (error) {
-      // Error already handled by useAuth
-    } finally {
-      setChangingPassword(false);
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'livrée':
-      case 'payée':
-        return 'bg-green-100 text-green-800';
-      case 'en cours':
-      case 'en préparation':
-        return 'bg-blue-100 text-blue-800';
-      case 'annulée':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen pt-18 flex items-center justify-center">
-        <Loader2 className="animate-spin text-[#8B7355]" size={48} />
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="animate-spin text-[#C9A84C] mb-4" size={32} />
+        <span className="text-[#2C2C2C] text-lg font-serif">Chargement...</span>
       </div>
     );
   }
 
+  // Stats
+  const totalSpent = orders.reduce((acc, o) => acc + (o.total || 0), 0);
+  const confirmedOrders = orders.filter(o => o.status === 'confirmed' || o.status === 'delivered').length;
+  const pendingOrders = orders.filter(o => o.status === 'pending').length;
+
   return (
-    <div className="min-h-screen pt-18 bg-warm-white">
-      <Toaster position="top-center" />
-      
-      {/* Hero Banner */}
-      <div className="relative h-[35vh] flex flex-col items-center justify-center bg-cream">
-        <div className="mb-4">
-          <div className="w-24 h-24 bg-gold/10 rounded-full flex items-center justify-center">
-            <User size={48} className="text-gold" />
+    <div className="min-h-screen bg-[#faf8f5] mt-18">
+      <Toaster />
+
+      {/* ── Hero Banner ── */}
+      <div className="relative bg-[#2C2C2C] overflow-hidden ">
+        {/* Decorative gold lines */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent" />
+          <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent" />
+          <div className="absolute top-6 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#C9A84C]/50 to-transparent" />
+        </div>
+        {/* Soft glow */}
+        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-64 h-32 bg-[#C9A84C]/10 blur-3xl rounded-full pointer-events-none" />
+
+        <div className="relative px-4 md:px-18 py-10">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+            {/* Avatar */}
+            <div className="relative">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#C9A84C] to-[#a8883c] flex items-center justify-center text-white text-3xl font-serif font-semibold shadow-lg shadow-[#C9A84C]/20">
+                {user.prenom?.[0]?.toUpperCase() || 'U'}
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-400 border-2 border-[#2C2C2C]" title="Connecté" />
+            </div>
+
+            {/* Info */}
+            <div className="flex-1">
+              <p className="text-[#C9A84C] text-xs uppercase tracking-widest font-medium mb-1">Mon espace</p>
+              <h1 className="text-white font-serif text-2xl md:text-3xl font-semibold leading-tight">
+                {user.prenom} {user.nom}
+              </h1>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
+                <span className="flex items-center gap-1.5 text-[#a8883c] text-sm">
+                  <Mail size={13} /> {user.email}
+                </span>
+                {user.telephone && (
+                  <span className="flex items-center gap-1.5 text-[#a8883c] text-sm">
+                    <Phone size={13} /> {user.telephone}
+                  </span>
+                )}
+              </div>
+            </div>
+
+           {/* Logout Button */}
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#3A3A3A] hover:bg-[#8B7355] text-white rounded-xl transition-all group shadow-md hover:shadow-lg"
+              >
+                <LogOut
+                  size={16}
+                  className="group-hover:rotate-12 transition-transform"
+                />
+                <span className="text-sm font-medium hidden sm:inline">
+                  Déconnexion
+                </span>
+              </button>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-[#FEF3C7] rounded-xl flex items-center justify-center">
+                <LogOut className="text-[#92400E]" size={24} />
+              </div>
+              <h3 className="text-xl font-bold text-[#3A3A3A]">
+                Confirmer la déconnexion
+              </h3>
+            </div>
+
+            <p className="text-[#6B6B6B] mb-6">
+              Êtes-vous sûr de vouloir vous déconnecter de votre session
+              administrateur ?
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 px-4 py-2.5 bg-[#E8E0D5] text-[#3A3A3A] rounded-xl font-medium hover:bg-[#D1C7B7] transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={confirmLogout}
+                className="flex-1 px-4 py-2.5 bg-[#C53030] text-white rounded-xl font-medium hover:bg-[#991B1B] transition-colors"
+              >
+                Déconnexion
+              </button>
+            </div>
           </div>
         </div>
-        <h1 className="font-serif text-4xl md:text-5xl font-light text-charcoal">
-          Mon <em className="italic text-gold">Profil</em>
-        </h1>
-        <p className="mt-3 text-text-light text-base">
-          {user.prenom} {user.nom} • {user.email}
-        </p>
+      )}
+          </div>
+        </div>
       </div>
 
-      {/* Contenu Principal */}
-      <section className="py-12 md:py-16 px-4 md:px-8 lg:px-14">
-        <div className="max-w-4xl mx-auto space-y-8">
-          
-          {/* Informations Personnelles */}
-          <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <User size={24} className="text-gold" />
-              <h2 className="font-serif text-2xl font-light text-charcoal">
-                Informations Personnelles
-              </h2>
-            </div>
-            
-            <form onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-charcoal mb-2">
-                    Prénom *
-                  </label>
-                  <input
-                    type="text"
-                    name="prenom"
-                    value={formData.prenom}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-border rounded focus:outline-none focus:border-gold transition-colors"
-                  />
-                </div>
+      {/* ── Content ── */}
+      <div className=" md:max-w-6xl mx-auto py-8">
 
-                <div>
-                  <label className="block text-sm font-medium text-charcoal mb-2">
-                    Nom *
-                  </label>
-                  <input
-                    type="text"
-                    name="nom"
-                    value={formData.nom}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-border rounded focus:outline-none focus:border-gold transition-colors"
-                  />
-                </div>
+        {/* Stats Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+          <StatCard icon={ShoppingBag} label="Commandes" value={orders.length} />
+          <StatCard icon={CheckCircle} label="Confirmées" value={confirmedOrders} />
+          <StatCard icon={Clock} label="En attente" value={pendingOrders} />
+          <StatCard icon={TrendingUp} label="Total dépensé" value={totalSpent > 0 ? totalSpent.toLocaleString('fr-FR') : '0'} sub="FCFA" />
+        </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-charcoal mb-2">
-                    <Mail size={16} className="inline mr-2" />
-                    Email (non modifiable)
-                  </label>
-                  <input
-                    type="email"
-                    value={user.email}
-                    disabled
-                    className="w-full px-4 py-3 border border-border rounded bg-gray-50 text-gray-500 cursor-not-allowed"
-                  />
-                </div>
+        {/* Tabs */}
+        <div className="flex gap-1 p-1 bg-white border border-[#e8e2d9] rounded-xl mb-6 w-fit shadow-sm">
+          {[
+            { key: 'orders', label: 'Mes commandes', icon: Package },
+            { key: 'profile', label: 'Mon profil', icon: User },
+          ].map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key as any)}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                activeTab === key
+                  ? 'bg-[#C9A84C] text-white shadow-sm'
+                  : 'text-[#8B7355] hover:text-[#2C2C2C] hover:bg-[#faf8f5]'
+              }`}
+            >
+              <Icon size={15} />
+              {label}
+            </button>
+          ))}
+        </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-charcoal mb-2">
-                    <Phone size={16} className="inline mr-2" />
-                    Téléphone
-                  </label>
-                  <input
-                    type="tel"
-                    name="telephone"
-                    value={formData.telephone}
-                    onChange={handleChange}
-                    placeholder="+221 77 123 45 67"
-                    className="w-full px-4 py-3 border border-border rounded focus:outline-none focus:border-gold transition-colors"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-charcoal mb-2">
-                    <MapPin size={16} className="inline mr-2" />
-                    Adresse
-                  </label>
-                  <input
-                    type="text"
-                    name="adresse"
-                    value={formData.adresse}
-                    onChange={handleChange}
-                    placeholder="12 Rue de la République, Dakar"
-                    className="w-full px-4 py-3 border border-border rounded focus:outline-none focus:border-gold transition-colors"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={savingProfile}
-                className="px-6 py-3 bg-charcoal text-white hover:bg-gold hover:text-charcoal transition-colors rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                {savingProfile ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" />
-                    Enregistrement...
-                  </>
-                ) : (
-                  'Sauvegarder les modifications'
-                )}
-              </button>
-            </form>
-          </div>
-
-          {/* Changement de mot de passe */}
-          <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <Lock size={24} className="text-gold" />
-              <h2 className="font-serif text-2xl font-light text-charcoal">
-                Changer le mot de passe
-              </h2>
-            </div>
-            
-            <form onSubmit={handlePasswordSubmit}>
-              <div className="space-y-4 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-charcoal mb-2">
-                    Mot de passe actuel
-                  </label>
-                  <input
-                    type="password"
-                    name="currentPassword"
-                    value={passwordData.currentPassword}
-                    onChange={handlePasswordChange}
-                    required
-                    className="w-full px-4 py-3 border border-border rounded focus:outline-none focus:border-gold transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-charcoal mb-2">
-                    Nouveau mot de passe
-                  </label>
-                  <input
-                    type="password"
-                    name="newPassword"
-                    value={passwordData.newPassword}
-                    onChange={handlePasswordChange}
-                    required
-                    minLength={6}
-                    className="w-full px-4 py-3 border border-border rounded focus:outline-none focus:border-gold transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-charcoal mb-2">
-                    Confirmer le nouveau mot de passe
-                  </label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={passwordData.confirmPassword}
-                    onChange={handlePasswordChange}
-                    required
-                    minLength={6}
-                    className="w-full px-4 py-3 border border-border rounded focus:outline-none focus:border-gold transition-colors"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={changingPassword}
-                className="px-6 py-3 bg-charcoal text-white hover:bg-gold hover:text-charcoal transition-colors rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                {changingPassword ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" />
-                    Modification...
-                  </>
-                ) : (
-                  'Changer le mot de passe'
-                )}
-              </button>
-            </form>
-          </div>
-
-          {/* Historique des commandes */}
-          <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <Package size={24} className="text-gold" />
-              <h2 className="font-serif text-2xl font-light text-charcoal">
-                Mes Commandes
-              </h2>
-            </div>
-
+        {/* ── Orders Tab ── */}
+        {activeTab === 'orders' && (
+          <div>
             {ordersLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="animate-spin text-[#8B7355]" size={32} />
+              <div className="flex flex-col items-center justify-center py-16">
+                <Loader2 className="animate-spin text-[#C9A84C] mb-3" size={28} />
+                <p className="text-[#8B7355] text-sm">Chargement de vos commandes...</p>
               </div>
             ) : orders.length === 0 ? (
-              <p className="text-text-light text-center py-8">
-                Vous n'avez pas encore passé de commande
-              </p>
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="w-16 h-16 rounded-2xl bg-[#C9A84C]/10 flex items-center justify-center mb-4">
+                  <ShoppingBag size={28} className="text-[#C9A84C]" />
+                </div>
+                <p className="font-serif text-lg text-[#2C2C2C] mb-1">Aucune commande pour l'instant</p>
+                <p className="text-sm text-[#8B7355] max-w-xs">
+                  Vos commandes apparaîtront ici une fois que vous aurez effectué vos premiers achats.
+                </p>
+              </div>
             ) : (
-              <div className="space-y-4">
-                {orders.slice(0, 5).map((order) => (
-                  <div
-                    key={order._id}
-                    className="border border-border rounded-lg p-4 hover:border-gold transition-colors"
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <p className="font-medium text-charcoal">
-                          Commande #{order._id.slice(-6)}
-                        </p>
-                        <p className="text-sm text-text-light">
-                          {new Date(order.createdAt).toLocaleDateString('fr-FR')}
-                        </p>
-                      </div>
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                          order.status
-                        )}`}
-                      >
-                        {order.status}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <p className="text-sm text-text-light">
-                        {order.items.length} article(s)
-                      </p>
-                      <p className="font-semibold text-gold">
-                        {order.totalPrice.toLocaleString()} FCFA
-                      </p>
+              <>
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-sm text-[#8B7355]">
+                    <span className="font-semibold text-[#2C2C2C]">{orders.length}</span> commande{orders.length > 1 ? 's' : ''} au total
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  {orders.map((order) => (
+                    <OrderCard key={order._id} order={order} />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ── Profile Tab ── */}
+        {activeTab === 'profile' && (
+          <div className="space-y-6">
+            {/* Info card */}
+            <div className="bg-white border border-[#e8e2d9] rounded-2xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-5">
+                <div className="w-8 h-8 rounded-lg bg-[#C9A84C]/10 flex items-center justify-center">
+                  <User size={15} className="text-[#C9A84C]" />
+                </div>
+                <h3 className="font-serif text-[#2C2C2C] font-semibold">Informations personnelles</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { label: 'Prénom', value: user.prenom, icon: User },
+                  { label: 'Nom', value: user.nom, icon: User },
+                  { label: 'Adresse email', value: user.email, icon: Mail },
+                  { label: 'Téléphone', value: user.telephone || '—', icon: Phone },
+                ].map(({ label, value, icon: Icon }) => (
+                  <div key={label}>
+                    <label className="flex items-center gap-1.5 text-xs font-medium text-[#8B7355] uppercase tracking-wider mb-2">
+                      <Icon size={11} />
+                      {label}
+                    </label>
+                    <div className="w-full px-4 py-3 bg-[#faf8f5] border border-[#e8e2d9] rounded-xl text-[#2C2C2C] text-sm font-medium">
+                      {value}
                     </div>
                   </div>
                 ))}
-                {orders.length > 5 && (
-                  <p className="text-sm text-center text-text-light">
-                    ... et {orders.length - 5} autres commande(s)
-                  </p>
-                )}
               </div>
-            )}
+
+              <div className="mt-4 pt-4 border-t border-[#e8e2d9] flex items-center gap-2">
+                <AlertCircle size={13} className="text-[#8B7355]" />
+                <p className="text-xs text-[#8B7355]">
+                  Pour modifier vos informations, veuillez contacter notre support.
+                </p>
+              </div>
+            </div>
+
+            {/* Security card */}
+            <div className="bg-white border border-[#e8e2d9] rounded-2xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-5">
+                <div className="w-8 h-8 rounded-lg bg-[#C9A84C]/10 flex items-center justify-center">
+                  <Lock size={15} className="text-[#C9A84C]" />
+                </div>
+                <h3 className="font-serif text-[#2C2C2C] font-semibold">Sécurité du compte</h3>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-[#faf8f5] border border-[#e8e2d9] rounded-xl">
+                <div>
+                  <p className="text-sm font-medium text-[#2C2C2C]">Mot de passe</p>
+                  <p className="text-xs text-[#8B7355] mt-0.5">••••••••••••</p>
+                </div>
+                <button
+                  onClick={() => toast('Fonctionnalité bientôt disponible', { icon: '🔒' })}
+                  className="px-4 py-2 rounded-lg border border-[#C9A84C] text-[#C9A84C] text-xs font-medium hover:bg-[#C9A84C] hover:text-white transition-all"
+                >
+                  Modifier
+                </button>
+              </div>
+            </div>
+
+            {/* Danger zone */}
+            <div className="bg-white border border-[#e8e2d9] rounded-2xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-5">
+                <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
+                  <LogOut size={15} className="text-red-500" />
+                </div>
+                <h3 className="font-serif text-[#2C2C2C] font-semibold">Session</h3>
+              </div>
+
+              <button
+                onClick={logout}
+                className="flex items-center gap-2 px-5 py-3 bg-[#2C2C2C] text-white rounded-xl text-sm font-medium hover:bg-red-600 transition-colors duration-200"
+              >
+                <LogOut size={15} />
+                Se déconnecter
+              </button>
+            </div>
           </div>
-        </div>
-      </section>
+        )}
+      </div>
     </div>
   );
 }

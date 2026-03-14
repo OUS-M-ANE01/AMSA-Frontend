@@ -3,14 +3,15 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import AdminLayout from './components/layout/AdminLayout';
 import Loader from './components/Loader';
-import { featuredProducts, jewelryProducts } from './data/products';
+import AuthModal from './components/AuthModal';
+import PaymentResult from './components/PaymentResult';
 import { Search, X, Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
 import { useCart } from './hooks/useCart';
 import { useFavorites } from './hooks/useFavorites';
+import { useAuth } from './hooks/useAuth';
 import './App.css';
 
 // Import direct des pages admin pour navigation instantanée
-import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
@@ -19,10 +20,11 @@ import AdminSettings from './pages/admin/AdminSettings';
 import AdminTestimonials from './pages/admin/AdminTestimonials';
 import AdminContent from './pages/admin/AdminContent';
 import AdminCategories from './pages/admin/AdminCategories';
+import AdminNotifications from './pages/admin/AdminNotifications';
 
 // Lazy load uniquement pour les pages front-end (optimisation SEO/Performance)
 const Home = lazy(() => import('./pages/Home'));
-const Collections = lazy(() => import('./pages/Collections'));
+const Soldes = lazy(() => import('./pages/Soldes'));
 const Vetements = lazy(() => import('./pages/Vetements'));
 const Bijoux = lazy(() => import('./pages/Bijoux'));
 const Apropos = lazy(() => import('./pages/Apropos'));
@@ -32,10 +34,18 @@ const Profil = lazy(() => import('./pages/Profil'));
 const Checkout = lazy(() => import('./pages/Checkout'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 
-// Helper pour obtenir la page depuis l'URL hash
+// Helper pour obtenir la page depuis l'URL hash (ignore les query params dans le hash)
 const getPageFromHash = (): PageType => {
   const hash = window.location.hash.slice(1); // Enlever le #
-  return hash || 'accueil';
+  const page = hash.split('?')[0];            // Ignorer les query params
+  return page || 'accueil';
+};
+
+// Helper pour lire les query params contenus dans le hash (#page?key=val)
+const getHashParams = (): URLSearchParams => {
+  const hash = window.location.hash.slice(1);
+  const queryStr = hash.includes('?') ? hash.split('?')[1] : '';
+  return new URLSearchParams(queryStr);
 };
 
 // Helper pour mettre à jour l'URL hash
@@ -43,14 +53,17 @@ const updateHash = (page: string) => {
   window.location.hash = page;
 };
 
-type PageType = 'accueil' | 'collections' | 'vetements' | 'bijoux' | 'apropos' | 'contact' | 'favoris' | 'profil' | 'panier' | 'checkout' | 'admin-login' | 'admin-dashboard' | 'admin-products' | 'admin-orders' | 'admin-users' | 'admin-settings' | 'admin-testimonials' | 'admin-content' | string;
+type PageType = 'accueil' | 'soldes' | 'vetements' | 'bijoux' | 'apropos' | 'contact' | 'favoris' | 'profil' | 'panier' | 'checkout' | 'auth' | 'admin-dashboard' | 'admin-products' | 'admin-orders' | 'admin-users' | 'admin-settings' | 'admin-testimonials' | 'admin-content' | 'admin-notifications' | string;
 
 function App() {
   // Initialiser avec la page depuis l'URL
   const [currentPage, setCurrentPage] = useState<PageType>(getPageFromHash());
   const [searchOpen, setSearchOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isNavigating, setIsNavigating] = useState(false);
+  
+  const { isAuthenticated } = useAuth();
   
   // Délai minimum pour le loader initial (800ms)
   useEffect(() => {
@@ -97,7 +110,6 @@ function App() {
   const { 
     items: cartItems, 
     isOpen: cartOpen, 
-    addToCart, 
     removeItem, 
     updateQuantity, 
     totalItems, 
@@ -109,20 +121,17 @@ function App() {
   // Use favorites store instead of local state
   const { favoriteIds, isFavorite, toggleFavorite } = useFavorites();
 
-  // Helper to wrap product for cart (for static products only)
-  const handleAddToCart = (id: string | number) => {
-    const product = [...featuredProducts, ...jewelryProducts].find(
-      p => String(p.id) === String(id) || p._id === String(id)
-    );
-    if (product) addToCart(product);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleAddToCart = (_id: string | number) => {
+    // Products handle their own cart via useCart internally
   };
 
   const renderPage = () => {
     // Gestion des pages admin
     if (typeof currentPage === 'string' && currentPage.startsWith('admin-')) {
       // Page de login admin sans layout
-      if (currentPage === 'admin-login') {
-        return <AdminLogin onNavigate={handleNavigate} />;
+      if (currentPage === 'auth') {
+        return <Auth onNavigate={handleNavigate} />;
       }
       
       // Autres pages admin avec layout
@@ -151,6 +160,9 @@ function App() {
           break;
         case 'admin-content':
           adminContent = <AdminContent />;
+          break;
+        case 'admin-notifications':
+          adminContent = <AdminNotifications />;
           break;
         default:
           adminContent = <AdminDashboard />;
@@ -188,8 +200,8 @@ function App() {
           />
         );
       
-      case 'collections':
-        return <Collections onNavigate={(page) => handleNavigate(page)} />;
+      case 'soldes':
+        return <Soldes onNavigate={(page) => handleNavigate(page)} />;
       
       case 'vetements':
         return (
@@ -229,25 +241,41 @@ function App() {
       
       case 'profil':
         return <Profil />;
-      
+        return <Profil onNavigate={handleNavigate} />;
       case 'checkout':
         return <Checkout onNavigate={(page) => handleNavigate(page)} />;
+
+      case 'commande-succes': {
+        const p = getHashParams();
+        return (
+          <PaymentResult
+            status="success"
+            orderId={p.get('order_id') || ''}
+            nabooId={p.get('naboo_id') || ''}
+            onNavigate={handleNavigate}
+          />
+        );
+      }
+
+      case 'commande-echec': {
+        const p = getHashParams();
+        return (
+          <PaymentResult
+            status="error"
+            orderId={p.get('order_id') || ''}
+            nabooId=''
+            onNavigate={handleNavigate}
+          />
+        );
+      }
       
       default:
         return null;
     }
   };
   
-  // Get cart products with full details from static data
-  const getCartProducts = () => {
-    const allProducts = [...featuredProducts, ...jewelryProducts];
-    return cartItems.map(item => {
-      const product = allProducts.find(p => String(p.id) === item.productId);
-      return product ? { ...product, quantity: item.quantity } : item;
-    });
-  };
-  
-  const cartProducts = getCartProducts();
+  // Get cart products - CartItem already contains name, price, image
+  const cartProducts = cartItems;
 
   // Vérifier si on est sur une page admin
   const isAdminPage = typeof currentPage === 'string' && currentPage.startsWith('admin-');
@@ -275,9 +303,26 @@ function App() {
         onSearchOpen={() => setSearchOpen(true)}
         onCartOpen={openCart}
         cartItemsCount={totalItems}
-        onProfileClick={() => handleNavigate('profil')}
+        onProfileClick={() => {
+          if (isAuthenticated) {
+            handleNavigate('profil');
+          } else {
+            setAuthModalOpen(true);
+          }
+        }}
       />
       
+      {/* Modal Auth */}
+      {authModalOpen && (
+        <AuthModal
+          onClose={() => setAuthModalOpen(false)}
+          onSuccess={() => {
+            setAuthModalOpen(false);
+            handleNavigate('profil');
+          }}
+        />
+      )}
+
       {/* Modal de recherche */}
       {searchOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-start justify-center pt-20">

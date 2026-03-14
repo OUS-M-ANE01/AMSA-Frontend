@@ -7,11 +7,12 @@ import JewelryProducts from '../components/sections/JewelryProducts';
 import Testimonials from '../components/sections/Testimonials';
 import Instagram from '../components/sections/Instagram';
 import Newsletter from '../components/sections/Newsletter';
+import WhatsAppPopup from '../components/WhatsAppPopup';
 
 interface HomeProps {
   onNavigate: (page: string) => void;
-  onAddToCart?: (productId: number) => void;
-  onToggleFavorite?: (productId: number) => void;
+  onAddToCart?: (productId: string | number) => void;
+  onToggleFavorite?: (productId: string | number) => void;
   favoriteItems?: number[];
 }
 
@@ -37,6 +38,7 @@ export default function Home({ onNavigate, onAddToCart, onToggleFavorite, favori
       <Testimonials />
       <Instagram />
       <Newsletter />
+      <WhatsAppPopup />
     </>
   );
 }

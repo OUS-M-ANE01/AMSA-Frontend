@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
+import ImageUploader from '../../components/admin/ImageUploader';
 import { 
   Plus,
   Edit2,
@@ -279,22 +280,11 @@ export default function AdminTestimonials() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[#3A3A3A] mb-2">URL de l'avatar *</label>
-                <input
-                  type="url"
-                  value={formData.avatar}
-                  onChange={(e) => setFormData({...formData, avatar: e.target.value})}
-                  required
-                  className="w-full px-4 py-2.5 border border-[#E8E0D5] rounded-xl focus:border-[#8B7355] focus:outline-none"
-                  placeholder="https://..."
+                <label className="block text-sm font-medium text-[#3A3A3A] mb-2">Avatar *</label>
+                <ImageUploader
+                  currentImage={formData.avatar}
+                  onImageSelect={(url) => setFormData({...formData, avatar: url})}
                 />
-                {formData.avatar && (
-                  <img
-                    src={formData.avatar}
-                    alt="Aperçu"
-                    className="mt-2 w-16 h-16 rounded-full object-cover border-2 border-[#8B7355]"
-                  />
-                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

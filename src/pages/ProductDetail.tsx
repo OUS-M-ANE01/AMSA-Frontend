@@ -15,10 +15,7 @@ interface ProductDetailProps {
 
 export default function ProductDetail({ 
   productId, 
-  onNavigate, 
-  onAddToCart,
-  onToggleFavorite,
-  isFavorite: propIsFavorite
+  onNavigate,
 }: ProductDetailProps) {
   const allStaticProducts = [...featuredProducts, ...jewelryProducts];
   const staticProduct = allStaticProducts.find(
@@ -42,18 +39,16 @@ export default function ProductDetail({
   }, [productId, staticProduct, fetchProductById]);
 
   const product = staticProduct || apiProduct;
-  const isFav = propIsFavorite ?? (product ? isFavHook(Number(product.id) || 0) : false);
+  const isFav = product ? isFavHook(product._id || product.id) : false;
 
   const handleAddToCart = () => {
     if (!product) return;
     addToCart(product);
-    if (onAddToCart) onAddToCart(product._id ?? product.id);
   };
 
   const handleToggleFavorite = () => {
     if (!product) return;
-    toggleFavorite(Number(product.id) || 0);
-    if (onToggleFavorite) onToggleFavorite(product._id ?? product.id);
+    toggleFavorite(product._id || product.id);
   };
 
   if (loading) {

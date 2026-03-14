@@ -89,12 +89,33 @@ export default function Categories({ onNavigate }: CategoriesProps) {
       {/* Bouton Voir tout centré en dessous */}
       <div className="text-center mt-8 md:mt-10">
         <button
-          onClick={() => onNavigate('collections')}
+          onClick={() => onNavigate('vetements')}
           className="inline-flex items-center gap-2 px-5 md:px-6 py-2.5 md:py-3 text-xs md:text-[13px] tracking-[0.15em] uppercase font-medium text-charcoal border border-charcoal hover:text-gold hover:border-gold transition-colors duration-200"
         >
           Voir tout
           <ArrowRight size={16} />
         </button>
+      </div>
+
+      {/* Filtres & Trier par */}
+      <div className="flex flex-row items-stretch justify-between gap-2 w-full mt-8 mb-6">
+        <div className="flex-1 flex justify-start">
+          <button className="px-4 py-2 border border-charcoal rounded font-medium text-charcoal bg-white hover:bg-gold hover:text-white transition-colors w-full max-w-[180px]">
+            <span className="flex items-center gap-2">
+              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sliders-horizontal"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+              Filtres
+            </span>
+          </button>
+        </div>
+        <div className="flex-1 flex justify-end">
+          <select className="px-4 py-2 border border-charcoal rounded font-medium text-charcoal bg-white hover:bg-gold hover:text-white transition-colors w-full max-w-[180px]">
+            <option value="default">Trier par</option>
+            <option value="price-asc">Prix croissant</option>
+            <option value="price-desc">Prix décroissant</option>
+            <option value="new">Nouveautés</option>
+            <option>Plus populaires</option>
+          </select>
+        </div>
       </div>
     </section>
   );

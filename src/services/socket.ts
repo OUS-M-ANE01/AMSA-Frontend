@@ -101,6 +101,27 @@ class SocketService {
       });
     });
 
+    // Paiement NabooPay confirmé (webhook)
+    this.socket.on('order:paid', (data: any) => {
+      console.log('💳 Paiement confirmé:', data);
+
+      const { updateOrder } = useOrdersStore.getState();
+      const { addNotification } = useNotificationStore.getState();
+
+      if (data.orderId) {
+        updateOrder(data.orderId, { status: 'confirmee' } as any);
+      }
+
+      addNotification({
+        type: 'order',
+        title: 'Paiement reçu',
+        message: `Commande ${data.orderNumber} payée via NabooPay`,
+        data,
+      });
+
+      this.playNotificationSound();
+    });
+
     // Écouter les utilisateurs en ligne (pour les admins)
     this.socket.on('users:online', (data: any) => {
       console.log('👥 Utilisateurs en ligne:', data.count);

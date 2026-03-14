@@ -1,7 +1,7 @@
 import { Search, Heart, ShoppingBag, Menu, X, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-type PageType = 'accueil' | 'collections' | 'vetements' | 'bijoux' | 'apropos' | 'contact' | 'favoris' | 'profil' | 'panier' | 'checkout';
+type PageType = 'accueil' | 'soldes' | 'vetements' | 'bijoux' | 'apropos' | 'contact' | 'favoris' | 'profil' | 'panier' | 'checkout';
 
 interface NavbarProps {
   currentPage: string;
@@ -26,7 +26,7 @@ export default function Navbar({ currentPage, onNavigate, onSearchOpen, onCartOp
 
   const navItems: { label: string; page: PageType }[] = [
     { label: 'Accueil', page: 'accueil' },
-    { label: 'Collections', page: 'collections' },
+    { label: 'Soldes', page: 'soldes' },
     { label: 'Vêtements', page: 'vetements' },
     { label: 'Bijoux', page: 'bijoux' },
     { label: 'À propos', page: 'apropos' },
@@ -48,16 +48,16 @@ export default function Navbar({ currentPage, onNavigate, onSearchOpen, onCartOp
 
         <button 
           onClick={() => handleNavigation('accueil')}
-          className="font-serif text-xl md:text-[26px] font-semibold tracking-wider text-charcoal hover:opacity-80 transition-opacity"
+          className="flex items-center gap-3 font-serif text-xl md:text-[26px] font-semibold tracking-wider text-charcoal hover:opacity-80 transition-opacity"
         >
-          Eva<span className="text-gold">Styl</span>
+          <img src="/AMSA.png" alt="ASMA Logo" className="w-24 h-24 object-contain mr-2" />
         </button>
 
         {/* Menu Desktop */}
         <ul className="hidden lg:flex gap-9 list-none">
           {navItems.map((item) => (
             <li key={item.page}>
-              <button 
+              <button
                 onClick={() => handleNavigation(item.page)}
                 className={`text-[13px] font-normal tracking-[0.1em] uppercase transition-colors ${
                   currentPage === item.page

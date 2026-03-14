@@ -182,26 +182,26 @@ export const jewelryProducts: Product[] = [
 export const testimonials: Testimonial[] = [
   {
     id: 1,
-    text: 'La robe midi est absolument magnifique, la qualité dépasse mes attentes. Je la porte à chaque occasion !',
-    author: 'Sophie M.',
+    text: 'La robe est absolument magnifique, la qualité dépasse mes attentes. Je la porte pour toutes mes occasions ici à Dakar !',
+    author: 'Fatou Diallo',
     role: 'Cliente fidèle',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b9c4c73b?w=80&h=80&fit=crop&crop=face',
-    rating: 5
-  },
-  {
-    id: 2,
-    text: 'Les bijoux EvaStyl sont d\'une finesse extraordinaire. Le collier dorée est ma pièce préférée, je reçois des compliments partout.',
-    author: 'Amina K.',
-    role: 'Acheteuse vérifiée',
     avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=80&h=80&fit=crop&crop=face',
     rating: 5
   },
   {
+    id: 2,
+    text: "Les bijoux EvaStyl sont d'une finesse extraordinaire. Le collier doré est ma pièce préférée, je reçois des compliments partout à Dakar !",
+    author: 'Aïssatou Ndiaye',
+    role: 'Acheteuse vérifiée',
+    avatar: 'https://images.unsplash.com/photo-1589156206285-96b2a2f5e870?w=80&h=80&fit=crop&crop=face',
+    rating: 5
+  },
+  {
     id: 3,
-    text: 'Livraison ultra rapide et emballage soigné. On sent vraiment le soin apporté à chaque détail. Je recommande sans hésiter !',
-    author: 'Clara D.',
+    text: 'Livraison rapide et emballage soigné. On sent vraiment le soin apporté à chaque détail. Je recommande sans hésiter à toutes mes amies de Thiès !',
+    author: 'Mariama Sow',
     role: 'Nouvelle cliente',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face',
+    avatar: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=80&h=80&fit=crop&crop=face',
     rating: 5
   }
 ];

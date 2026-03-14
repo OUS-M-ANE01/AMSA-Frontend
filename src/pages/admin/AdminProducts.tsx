@@ -12,7 +12,9 @@ import {
   Loader2,
   X,
  Grid3x3,
-  List
+  List,
+  Tag,
+  Percent
 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import ImageUploader from '../../components/admin/ImageUploader';
@@ -38,6 +40,10 @@ export default function AdminProducts() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showFormModal, setShowFormModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showSaleModal, setShowSaleModal] = useState(false);
+  const [saleTarget, setSaleTarget] = useState<any>(null);
+  const [saleData, setSaleData] = useState({ oldPrice: 0, price: 0 });
+  const [filterSale, setFilterSale] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [editMode, setEditMode] = useState(false);
@@ -61,9 +67,10 @@ export default function AdminProducts() {
       const catId = typeof p.category === 'string' ? p.category : (p.category as any)?._id || '';
       const matchCat = !selectedCategory || catId === selectedCategory || catName.toLowerCase().includes(selectedCategory.toLowerCase());
       const matchSearch = !searchTerm || p.name.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchCat && matchSearch;
+      const matchSale = !filterSale || p.badge === 'sale';
+      return matchCat && matchSearch && matchSale;
     });
-  }, [products, selectedCategory, searchTerm]);
+  }, [products, selectedCategory, searchTerm, filterSale]);
 
   // Fonctions CRUD avec API directe
   const handleSearch = () => {
@@ -122,6 +129,33 @@ export default function AdminProducts() {
     });
     setShowFormModal(true);
   };
+
+  const openSaleModal = (product: any) => {
+    setSaleTarget(product);
+    setSaleData({ oldPrice: product.oldPrice || product.price, price: product.price });
+    setShowSaleModal(true);
+  };
+
+  const handleToggleSale = async () => {
+    if (!saleTarget) return;
+    const isCurrentlySale = saleTarget.badge === 'sale';
+    try {
+      const updatePayload = isCurrentlySale
+        ? { badge: '', oldPrice: undefined }
+        : { badge: 'sale', oldPrice: saleData.oldPrice, price: saleData.price };
+      const response = await productsAPI.update(saleTarget._id, updatePayload);
+      updateInStore(saleTarget._id, response.data.data);
+      toast.success(isCurrentlySale ? 'Produit retiré des soldes' : 'Produit mis en soldes !');
+      setShowSaleModal(false);
+      setSaleTarget(null);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Erreur lors de la mise à jour');
+    }
+  };
+
+  const saleDiscount = saleData.oldPrice > 0
+    ? Math.round((1 - saleData.price / saleData.oldPrice) * 100)
+    : 0;
 
   const openDetailModal = (product: any) => {
     setSelectedProduct(product);
@@ -215,6 +249,15 @@ export default function AdminProducts() {
         </div>
       </div>
 
+      {/* Bandeau soldes actifs */}
+      {(() => { const saleCount = products.filter(p => p.badge === 'sale').length; return saleCount > 0 ? (
+        <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-5 py-3">
+          <Tag className="text-red-500 flex-shrink-0" size={20} />
+          <p className="text-red-700 text-sm font-medium">{saleCount} produit{saleCount > 1 ? 's' : ''} actuellement en soldes</p>
+          <button onClick={() => setFilterSale(true)} className="ml-auto text-xs text-red-600 underline hover:text-red-800">Voir uniquement</button>
+        </div>
+      ) : null; })()}
+
       {/* Filtres */}
       <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E8E0D5]">
         <div className="flex flex-col md:flex-row gap-4">
@@ -239,6 +282,17 @@ export default function AdminProducts() {
               <option key={cat._id} value={cat._id}>{cat.name}</option>
             ))}
           </select>
+          <button
+            onClick={() => setFilterSale(!filterSale)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+              filterSale
+                ? 'bg-red-500 text-white border-red-500'
+                : 'border-[#D4C4B0] text-[#6B6B6B] hover:border-red-400 hover:text-red-500'
+            }`}
+          >
+            <Tag size={16} />
+            {filterSale ? 'En soldes ✓' : 'En soldes'}
+          </button>
           <button
             onClick={handleSearch}
             className="px-6 py-2 bg-[#8B7355] text-white rounded-lg hover:bg-[#6D5942] transition-colors"
@@ -269,6 +323,17 @@ export default function AdminProducts() {
                   </span>
                 )}
                 <div className="absolute top-2 right-2 flex gap-1">
+                  <button
+                    onClick={() => openSaleModal(product)}
+                    className={`p-1.5 rounded-lg transition-colors shadow-sm ${
+                      product.badge === 'sale'
+                        ? 'bg-red-500 text-white hover:bg-red-600'
+                        : 'bg-white/90 hover:bg-white text-[#6B6B6B] hover:text-red-500'
+                    }`}
+                    title={product.badge === 'sale' ? 'Gérer le solde' : 'Mettre en soldes'}
+                  >
+                    <Tag size={14} />
+                  </button>
                   <button
                     onClick={() => openDetailModal(product)}
                     className="p-1.5 bg-white/90 hover:bg-white rounded-lg transition-colors shadow-sm"
@@ -301,9 +366,17 @@ export default function AdminProducts() {
                 <p className="text-xs text-[#6B6B6B] mb-2">{typeof product.category === 'string' ? product.category : product.category?.name || 'Sans catégorie'}</p>
                 
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-base font-bold text-[#8B7355]">
-                    {product.price.toLocaleString()} F
-                  </span>
+                  <div>
+                    <span className="text-base font-bold text-[#8B7355]">
+                      {product.price.toLocaleString()} F
+                    </span>
+                    {product.oldPrice && product.oldPrice > product.price && (
+                      <>
+                        <span className="text-xs text-[#9B9B9B] line-through ml-1">{product.oldPrice.toLocaleString()} F</span>
+                        <span className="ml-1 text-xs text-red-500 font-bold">-{Math.round((1 - product.price / product.oldPrice) * 100)}%</span>
+                      </>
+                    )}
+                  </div>
                   <span
                     className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                       product.stock < 10
@@ -360,7 +433,7 @@ export default function AdminProducts() {
                         <div>
                           <p className="font-medium text-[#3A3A3A] text-sm">{product.name}</p>
                           {product.badge && (
-                            <span className="text-xs text-[#8B7355]">{product.badge}</span>
+                            <span className={`text-xs font-medium ${product.badge === 'sale' ? 'text-red-500' : 'text-[#8B7355]'}`}>{product.badge === 'sale' ? '🏷️ En soldes' : product.badge}</span>
                           )}
                         </div>
                       </div>
@@ -368,8 +441,12 @@ export default function AdminProducts() {
                     <td className="py-2 px-3 text-[#6B6B6B] text-xs">
                       {typeof product.category === 'string' ? product.category : product.category?.name || 'Sans catégorie'}
                     </td>
-                    <td className="py-2 px-3 font-semibold text-[#8B7355] text-sm">
-                      {product.price.toLocaleString()} F
+                    <td className="py-2 px-3 text-sm">
+                      <span className="font-semibold text-[#8B7355]">{product.price.toLocaleString()} F</span>
+                      {product.oldPrice && product.oldPrice > product.price && (
+                        <><br /><span className="text-xs text-[#9B9B9B] line-through">{product.oldPrice.toLocaleString()} F</span>
+                        <span className="ml-1 text-xs text-red-500 font-bold">-{Math.round((1 - product.price / product.oldPrice) * 100)}%</span></>
+                      )}
                     </td>
                     <td className="py-2 px-3">
                       <span
@@ -398,6 +475,17 @@ export default function AdminProducts() {
                     </td>
                     <td className="py-2 px-3">
                       <div className="flex gap-1">
+                        <button
+                          onClick={() => openSaleModal(product)}
+                          className={`p-1.5 rounded-lg transition-colors ${
+                            product.badge === 'sale'
+                              ? 'bg-red-100 text-red-500 hover:bg-red-200'
+                              : 'text-[#6B6B6B] hover:bg-[#F5F1ED] hover:text-red-500'
+                          }`}
+                          title={product.badge === 'sale' ? 'Gérer le solde' : 'Mettre en soldes'}
+                        >
+                          <Tag size={14} />
+                        </button>
                         <button
                           onClick={() => openDetailModal(product)}
                           className="p-1.5 text-[#8B7355] hover:bg-[#F5F1ED] rounded-lg transition-colors"
@@ -478,7 +566,7 @@ export default function AdminProducts() {
                         value={formData.brand} 
                         onChange={(e) => setFormData({...formData, brand: e.target.value})} 
                         className="w-full px-4 py-2.5 border border-[#D4C4B0] rounded-lg focus:ring-2 focus:ring-[#8B7355] focus:outline-none transition-all" 
-                        placeholder="Ex: EvaStyl"
+                        placeholder="Ex: ASMA"
                       />
                     </div>
                     <div>
@@ -676,6 +764,83 @@ export default function AdminProducts() {
               <button onClick={() => {setShowDetailModal(false); openEditModal(selectedProduct);}} className="flex-1 px-4 py-2 bg-[#8B7355] text-white rounded-lg hover:bg-[#6D5942]">Modifier</button>
               <button onClick={() => setShowDetailModal(false)} className="flex-1 px-4 py-2 border border-[#D4C4B0] text-[#3A3A3A] rounded-lg hover:bg-[#F5F1ED]">Fermer</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Soldes */}
+      {showSaleModal && saleTarget && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full">
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-red-50 rounded-full"><Tag className="text-red-500" size={24} /></div>
+                <div>
+                  <h3 className="text-xl font-bold text-[#3A3A3A]">Gérer le solde</h3>
+                  <p className="text-sm text-[#6B6B6B] truncate max-w-[200px]">{saleTarget.name}</p>
+                </div>
+              </div>
+              <button onClick={() => setShowSaleModal(false)} className="p-2 hover:bg-[#F5F1ED] rounded-lg"><X size={20} className="text-[#6B6B6B]" /></button>
+            </div>
+
+            {saleTarget.badge === 'sale' ? (
+              /* Produit déjà en soldes → proposition de retirer */
+              <div className="space-y-4">
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                  <p className="text-red-700 font-medium text-sm">Ce produit est actuellement en soldes</p>
+                  <div className="mt-2 flex items-center gap-3">
+                    <span className="text-lg font-bold text-[#8B7355]">{saleTarget.price.toLocaleString()} F</span>
+                    {saleTarget.oldPrice && <span className="text-[#9B9B9B] line-through">{saleTarget.oldPrice.toLocaleString()} F</span>}
+                    {saleTarget.oldPrice && <span className="text-red-500 font-bold">-{Math.round((1 - saleTarget.price / saleTarget.oldPrice) * 100)}%</span>}
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <button onClick={() => setShowSaleModal(false)} className="flex-1 px-4 py-2 border border-[#D4C4B0] text-[#3A3A3A] rounded-lg hover:bg-[#F5F1ED]">Fermer</button>
+                  <button onClick={handleToggleSale} className="flex-1 px-4 py-2 bg-[#6B7280] text-white rounded-lg hover:bg-[#4B5563]">Retirer des soldes</button>
+                </div>
+              </div>
+            ) : (
+              /* Mettre en soldes */
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-[#3A3A3A] mb-1.5">Prix original (avant réduction)</label>
+                  <input
+                    type="number"
+                    value={saleData.oldPrice}
+                    onChange={(e) => setSaleData({ ...saleData, oldPrice: Number(e.target.value) })}
+                    className="w-full px-4 py-2.5 border border-[#D4C4B0] rounded-lg focus:ring-2 focus:ring-red-400 focus:outline-none"
+                    placeholder="Ex: 25000"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#3A3A3A] mb-1.5">Prix soldé (nouveau prix)</label>
+                  <input
+                    type="number"
+                    value={saleData.price}
+                    onChange={(e) => setSaleData({ ...saleData, price: Number(e.target.value) })}
+                    className="w-full px-4 py-2.5 border border-[#D4C4B0] rounded-lg focus:ring-2 focus:ring-red-400 focus:outline-none"
+                    placeholder="Ex: 18000"
+                  />
+                </div>
+                {saleDiscount > 0 && (
+                  <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                    <Percent className="text-red-500" size={18} />
+                    <span className="text-red-700 font-bold text-lg">-{saleDiscount}%</span>
+                    <span className="text-red-600 text-sm">de réduction</span>
+                  </div>
+                )}
+                <div className="flex gap-3">
+                  <button onClick={() => setShowSaleModal(false)} className="flex-1 px-4 py-2 border border-[#D4C4B0] text-[#3A3A3A] rounded-lg hover:bg-[#F5F1ED]">Annuler</button>
+                  <button
+                    onClick={handleToggleSale}
+                    disabled={saleData.oldPrice <= 0 || saleData.price <= 0 || saleData.price >= saleData.oldPrice}
+                    className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Mettre en soldes
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

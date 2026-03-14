@@ -10,8 +10,6 @@ import {
   X,
   ToggleLeft,
   ToggleRight,
-  MoveUp,
-  MoveDown,
 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import ImageUploader from '../../components/admin/ImageUploader';
@@ -21,7 +19,6 @@ interface CategoryForm {
   name: string;
   description: string;
   image: string;
-  order: number;
   isActive: boolean;
 }
 
@@ -30,7 +27,6 @@ const emptyForm: CategoryForm = {
   name: '',
   description: '',
   image: '',
-  order: 0,
   isActive: true,
 };
 
@@ -65,9 +61,7 @@ export default function AdminCategories() {
     try {
       const res = await categoriesAPI.getAll();
       const data = res.data?.data || res.data || [];
-      // Trier par order, puis par name
-      const sorted = [...data].sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0));
-      setCategories(sorted);
+      setCategories(data);
     } catch {
       toast.error('Impossible de charger les catégories');
     } finally {
@@ -93,7 +87,6 @@ export default function AdminCategories() {
       name: cat.name,
       description: cat.description || '',
       image: cat.image || '',
-      order: cat.order ?? 0,
       isActive: cat.isActive !== false,
     });
     setEditMode(true);
@@ -126,7 +119,6 @@ export default function AdminCategories() {
         name: formData.name.trim(),
         description: formData.description.trim() || undefined,
         image: formData.image.trim(),
-        order: formData.order,
         isActive: formData.isActive,
       };
 
@@ -175,19 +167,6 @@ export default function AdminCategories() {
       const msg = err.response?.data?.message || 'Impossible de supprimer cette catégorie';
       toast.error(msg);
       setShowDeleteModal(false);
-    }
-  };
-
-  // -------------------------------------------------------
-  //  Réordonnancement rapide
-  // -------------------------------------------------------
-  const moveOrder = async (cat: any, dir: 'up' | 'down') => {
-    try {
-      const newOrder = dir === 'up' ? cat.order - 1 : cat.order + 1;
-      await categoriesAPI.update(cat._id, { order: newOrder });
-      loadCategories();
-    } catch {
-      toast.error('Erreur de réordonnancement');
     }
   };
 
@@ -291,28 +270,7 @@ export default function AdminCategories() {
                 )}
 
                 {/* Actions */}
-                <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#F0EDE8]">
-                  {/* Ordre */}
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => moveOrder(cat, 'up')}
-                      className="p-1 text-[#6B6B6B] hover:text-[#3A3A3A] transition-colors"
-                      title="Monter"
-                    >
-                      <MoveUp size={15} />
-                    </button>
-                    <span className="text-xs text-[#9B8E7E] w-4 text-center">{cat.order}</span>
-                    <button
-                      onClick={() => moveOrder(cat, 'down')}
-                      className="p-1 text-[#6B6B6B] hover:text-[#3A3A3A] transition-colors"
-                      title="Descendre"
-                    >
-                      <MoveDown size={15} />
-                    </button>
-                  </div>
-
-                  {/* Autres actions */}
-                  <div className="flex items-center gap-1">
+                <div className="flex items-center justify-end mt-3 pt-3 border-t border-[#F0EDE8] gap-1">
                     <button
                       onClick={() => handleToggleActive(cat)}
                       className="p-1.5 rounded hover:bg-[#F5F3F0] transition-colors"
@@ -338,7 +296,6 @@ export default function AdminCategories() {
                       <Trash2 size={16} />
                     </button>
                   </div>
-                </div>
               </div>
             </div>
           ))}
@@ -418,35 +375,23 @@ export default function AdminCategories() {
                 />
               </div>
 
-              {/* Ordre + Statut */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#3A3A3A] mb-1.5">Ordre d'affichage</label>
-                  <input
-                    type="number"
-                    min={0}
-                    value={formData.order}
-                    onChange={e => setFormData(f => ({ ...f, order: Number(e.target.value) }))}
-                    className="w-full px-3 py-2.5 border border-[#E5E3DF] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B7355] text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#3A3A3A] mb-1.5">Statut</label>
-                  <button
-                    type="button"
-                    onClick={() => setFormData(f => ({ ...f, isActive: !f.isActive }))}
-                    className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
-                      formData.isActive
-                        ? 'bg-green-50 border-green-200 text-green-700'
-                        : 'bg-gray-50 border-gray-200 text-gray-600'
-                    }`}
-                  >
-                    {formData.isActive
-                      ? <><ToggleRight size={18} /> Actif</>
-                      : <><ToggleLeft size={18} /> Inactif</>
-                    }
-                  </button>
-                </div>
+              {/* Statut seul */}
+              <div>
+                <label className="block text-sm font-medium text-[#3A3A3A] mb-1.5">Statut</label>
+                <button
+                  type="button"
+                  onClick={() => setFormData(f => ({ ...f, isActive: !f.isActive }))}
+                  className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
+                    formData.isActive
+                      ? 'bg-green-50 border-green-200 text-green-700'
+                      : 'bg-gray-50 border-gray-200 text-gray-600'
+                  }`}
+                >
+                  {formData.isActive
+                    ? <><ToggleRight size={18} /> Actif</>
+                    : <><ToggleLeft size={18} /> Inactif</>
+                  }
+                </button>
               </div>
             </form>
 

@@ -1,6 +1,12 @@
+import { useState, useEffect, useMemo } from 'react';
 import { ArrowRight } from 'lucide-react';
 import ProductCard from '../ProductCard';
+import { productsAPI, adminAPI } from '../../services/api';
+import { adaptApiProduct } from '../../hooks/usePublicProducts';
+import { useCart } from '../../hooks/useCart';
+import { useFavorites } from '../../hooks/useFavorites';
 import { featuredProducts } from '../../data/products';
+import type { Product } from '../../types';
 
 interface FeaturedProductsProps {
   onNavigate: (page: string) => void;
@@ -9,12 +15,42 @@ interface FeaturedProductsProps {
   favoriteItems?: number[];
 }
 
-export default function FeaturedProducts({ 
-  onNavigate, 
-  onAddToCart, 
-  onToggleFavorite, 
-  favoriteItems = [] 
-}: FeaturedProductsProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default function FeaturedProducts({ onNavigate }: FeaturedProductsProps) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { addToCart } = useCart();
+  const { isFavorite, toggleFavorite } = useFavorites();
+
+  useEffect(() => {
+    Promise.all([
+      productsAPI.getAll({ limit: 100 }),
+      adminAPI.getContentBySection('featured_products').catch(() => null),
+    ])
+      .then(([prodsRes, contentRes]) => {
+        const data = prodsRes.data?.data || prodsRes.data?.products || prodsRes.data || [];
+        const adapted = Array.isArray(data) ? data.map(adaptApiProduct) : [];
+        const pinnedIds: string[] = contentRes?.data?.data?.content?.pinnedIds || [];
+        if (pinnedIds.length > 0 && adapted.length > 0) {
+          const pinned = pinnedIds
+            .map(id => adapted.find(p => String(p._id || p.id) === id))
+            .filter(Boolean) as Product[];
+          setProducts(pinned.length > 0 ? pinned : adapted.slice(0, 4));
+        } else {
+          // Fallback: produits badge new/bestseller
+          const fallback = adapted.filter(p => p.badge === 'new' || p.badge === 'bestseller');
+          setProducts(fallback.length > 0 ? fallback.slice(0, 4) : adapted.slice(0, 4));
+        }
+      })
+      .catch(() => setProducts(featuredProducts))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleAddToCart = useMemo(() => (productId: string | number) => {
+    const product = products.find(p => String(p._id || p.id) === String(productId));
+    if (product) addToCart(product);
+  }, [products, addToCart]);
+
   return (
     <section id="produits" className="px-4 md:px-8 lg:px-14 py-16 md:py-24 bg-warm-white">
       <div>
@@ -34,18 +70,30 @@ export default function FeaturedProducts({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7">
-        {featuredProducts.map(product => (
-          <ProductCard 
-            key={product.id} 
-            product={product}
-            onNavigate={onNavigate}
-            onAddToCart={onAddToCart}
-            onToggleFavorite={onToggleFavorite}
-            isFavorite={favoriteItems.includes(Number(product.id))}
-          />
-        ))}
-      </div>
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="animate-pulse">
+              <div className="bg-[#E8E0D5] aspect-[3/4] rounded-md mb-3" />
+              <div className="h-4 bg-[#E8E0D5] rounded w-3/4 mb-2" />
+              <div className="h-4 bg-[#E8E0D5] rounded w-1/2" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7">
+          {products.map(product => (
+            <ProductCard
+              key={String(product._id || product.id)}
+              product={product}
+              onNavigate={onNavigate}
+              onAddToCart={handleAddToCart}
+              onToggleFavorite={toggleFavorite}
+              isFavorite={isFavorite(product._id || product.id)}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

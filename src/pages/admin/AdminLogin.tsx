@@ -130,7 +130,7 @@ export default function AdminLogin({ onNavigate }: AdminLoginProps) {
 
           {/* Footer info */}
           <div className="text-white/50 text-sm">
-            <p>© 2025 EvaStyl. Tous droits réservés.</p>
+            <p>© 2025 ASMA. Tous droits réservés.</p>
           </div>
         </div>
       </div>
@@ -142,7 +142,7 @@ export default function AdminLogin({ onNavigate }: AdminLoginProps) {
           <div className="flex justify-center mb-4 z-index-1">
             <img 
               src="/logo_evastyl.png" 
-              alt="EvaStyl Logo" 
+              alt="ASMA Logo" 
               className="h-24 w-auto"
             />
           </div>
@@ -168,7 +168,7 @@ export default function AdminLogin({ onNavigate }: AdminLoginProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 bg-white border-2 border-[#E0DDD8] rounded-lg text-[#2C2C2C] placeholder-[#B8B3AD] focus:outline-none focus:border-[#8B7355] focus:ring-4 focus:ring-[#8B7355]/10 transition-all"
-                placeholder="admin@evastyl.com"
+                placeholder="admin@asma.com"
                 disabled={loading}
               />
             </div>
@@ -245,7 +245,7 @@ export default function AdminLogin({ onNavigate }: AdminLoginProps) {
           {/* Info dev */}
           <div className="mt-8 pt-6 border-t border-[#E0DDD8]">
             <p className="text-xs text-[#B8B3AD] text-center">
-              Environnement de test : admin@evastyl.com / Admin@123456
+              Environnement de test : admin@asma.com / Admin@123456
             </p>
           </div>
         </div>

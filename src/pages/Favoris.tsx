@@ -1,17 +1,37 @@
+import { useEffect, useMemo } from 'react';
 import ProductCard from '../components/ProductCard';
-import { featuredProducts, jewelryProducts } from '../data/products';
+import { usePublicProducts } from '../hooks/usePublicProducts';
+import { useCart } from '../hooks/useCart';
+import { useFavorites } from '../hooks/useFavorites';
 
 interface FavorisProps {
   onNavigate: (page: string) => void;
-  favoriteItems: number[];
-  onToggleFavorite: (productId: string | number) => void;
+  favoriteItems?: number[];
+  onToggleFavorite?: (productId: string | number) => void;
   onAddToCart?: (productId: string | number) => void;
 }
 
-export default function Favoris({ onNavigate, favoriteItems, onToggleFavorite, onAddToCart }: FavorisProps) {
-  // Récupérer les produits favoris
-  const allProducts = [...featuredProducts, ...jewelryProducts];
-  const favoriteProducts = allProducts.filter(product => favoriteItems.includes(Number(product.id)));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default function Favoris({ onNavigate }: FavorisProps) {
+  const { products: apiProducts, loading, fetchProducts } = usePublicProducts();
+  const { addToCart } = useCart();
+  const { favoriteIds, isFavorite, toggleFavorite } = useFavorites();
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  const favoriteProducts = useMemo(() => {
+    return apiProducts.filter(p => {
+      const id = String(p._id || p.id);
+      return favoriteIds.includes(id);
+    });
+  }, [apiProducts, favoriteIds]);
+
+  const handleAddToCart = (productId: string | number) => {
+    const product = favoriteProducts.find(p => String(p._id || p.id) === String(productId));
+    if (product) addToCart(product);
+  };
 
   return (
     <div className="min-h-screen pt-18">
@@ -20,24 +40,36 @@ export default function Favoris({ onNavigate, favoriteItems, onToggleFavorite, o
           Mes <em className="italic text-gold">Favoris</em>
         </h1>
         <p className="mt-4 text-text-light text-base md:text-lg">
-          {favoriteProducts.length > 0 
-            ? `${favoriteProducts.length} article${favoriteProducts.length > 1 ? 's' : ''} dans vos favoris`
-            : 'Retrouvez tous vos articles préférés'}
+          {loading
+            ? 'Chargement...'
+            : favoriteProducts.length > 0
+              ? `${favoriteProducts.length} article${favoriteProducts.length > 1 ? 's' : ''} dans vos favoris`
+              : 'Retrouvez tous vos articles préférés'}
         </p>
       </div>
       
       <section className="py-12 md:py-16 lg:py-20 px-4 md:px-8 lg:px-14 bg-warm-white">
         <div className="max-w-7xl mx-auto">
-          {favoriteProducts.length > 0 ? (
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-[#E8E0D5] aspect-[3/4] rounded-md mb-3" />
+                  <div className="h-4 bg-[#E8E0D5] rounded w-3/4 mb-2" />
+                  <div className="h-4 bg-[#E8E0D5] rounded w-1/2" />
+                </div>
+              ))}
+            </div>
+          ) : favoriteProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
               {favoriteProducts.map(product => (
-                <ProductCard 
-                  key={product.id} 
+                <ProductCard
+                  key={String(product._id || product.id)}
                   product={product}
                   onNavigate={onNavigate}
-                  onToggleFavorite={onToggleFavorite}
-                  onAddToCart={onAddToCart}
-                  isFavorite={true}
+                  onToggleFavorite={toggleFavorite}
+                  onAddToCart={handleAddToCart}
+                  isFavorite={isFavorite(product._id || product.id)}
                 />
               ))}
             </div>

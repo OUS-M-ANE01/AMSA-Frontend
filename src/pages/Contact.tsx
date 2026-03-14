@@ -57,7 +57,7 @@ export default function Contact() {
                   <Mail className="w-5 h-5 text-gold mt-1" />
                   <div>
                     <h3 className="text-charcoal font-medium mb-1">Email</h3>
-                    <p className="text-text-light text-sm">contact@evastyl.com</p>
+                    <p className="text-text-light text-sm">contact@asma.com</p>
                   </div>
                 </div>
                 

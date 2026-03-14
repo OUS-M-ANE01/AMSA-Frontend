@@ -19,6 +19,7 @@ interface Product {
   name: string;
   description: string;
   price: number;
+  oldPrice?: number;
   category: string | Category;
   image: string;
   images: string[];
