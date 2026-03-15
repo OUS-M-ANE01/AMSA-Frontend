@@ -35,9 +35,9 @@ export default function Hero({ onNavigate }: HeroProps = {}) {
     Array.isArray(c.images) && c.images.length === 3 ? c.images : DEFAULT_IMAGES;
 
   return (
-    <section className="pt-24 pb-2 md:min-h-screen md:pt-20 md:pb-8 flex flex-col items-center justify-center text-center relative overflow-hidden bg-cream px-4">
+    <section className="pt-32 pb-2 md:min-h-screen md:pt-20 md:pb-8 flex flex-col items-center justify-center text-center relative overflow-hidden bg-cream px-4">
 
-      <h1 className="font-serif text-4xl md:text-6xl lg:text-[clamp(52px,8vw,92px)] font-light leading-[1.15] md:leading-[1.05] tracking-tight text-charcoal animate-[fadeUp_0.7s_0.1s_ease_both]">
+      <h1 className="font-serif text-5xl md:text-6xl lg:text-[clamp(52px,8vw,92px)] font-light leading-[1.15] md:leading-[1.05] tracking-tight text-charcoal animate-[fadeUp_0.7s_0.1s_ease_both]">
         {titleBefore} <em className="italic text-gold">{titleHighlight}</em><br/>{titleAfter}
       </h1>
 
