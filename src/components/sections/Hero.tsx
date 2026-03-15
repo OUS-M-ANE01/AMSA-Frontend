@@ -60,7 +60,7 @@ export default function Hero({ onNavigate }: HeroProps = {}) {
         </button>
       </div>
 
-      <div className="flex flex-row gap-2 sm:gap-4 mt-8 md:mt-14 items-end animate-[fadeUp_0.8s_0.4s_ease_both] relative">
+      <div className="flex flex-row gap-2 sm:gap-4 mt-14 md:mt-14 items-end animate-[fadeUp_0.8s_0.4s_ease_both] relative">
         <div className="relative overflow-hidden rounded-md shadow-[0_20px_60px_rgba(0,0,0,0.12)] w-[100px] sm:w-[220px] md:w-[250px] h-[140px] sm:h-[300px] md:h-[320px] sm:-rotate-2 hover:-translate-y-2 hover:rotate-[-2deg] transition-all duration-400 group">
           <img
             src={images[0].url}
