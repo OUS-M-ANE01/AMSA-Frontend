@@ -73,7 +73,7 @@ export default function Vetements({ onNavigate }: VetementsProps) {
   };
 
   const handleToggleFavorite = (productId: string | number) => {
-    toggleFavorite(Number(productId) || 0);
+    toggleFavorite(productId);
   };
 
   return (
@@ -200,7 +200,7 @@ export default function Vetements({ onNavigate }: VetementsProps) {
                     onAddToCart={handleAddToCart}
                     onNavigate={onNavigate}
                     onToggleFavorite={handleToggleFavorite}
-                    isFavorite={isFavorite(Number(product.id))}
+                    isFavorite={isFavorite(product._id || product.id)}
                   />
                 ))}
               </div>

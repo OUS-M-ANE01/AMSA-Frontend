@@ -69,7 +69,7 @@ export default function Collections({ onNavigate, onAddToCart }: CollectionsProp
                 onClick={() => onNavigate('vetements')}
                 className="px-8 py-3 bg-charcoal text-white hover:bg-gold transition-colors duration-300"
               >
-                Découvrir la collection
+                Découvrez nos produits
               </button>
             </div>
             <div className="relative aspect-[3/4]">

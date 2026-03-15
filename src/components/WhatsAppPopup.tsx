@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 export default function WhatsAppPopup() {
   const [open, setOpen] = useState(false);
-  const whatsappNumber = '+221781166720'; // Numéro admin
+  const whatsappNumber = '+221787965132'; // Numéro admin
   const whatsappUrl = `https://wa.me/${whatsappNumber.replace('+', '')}`;
 
   return (

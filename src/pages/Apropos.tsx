@@ -4,9 +4,9 @@ export default function Apropos() {
       <div className="relative h-[50vh] flex flex-col items-center justify-center overflow-hidden">
         {/* Image de fond */}
         <img 
-          src="https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=1600&q=80" 
+          src="https://vizadmedia.com/wp-content/uploads/2017/12/banner_propos.jpg" 
           alt="À propos"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-fit"
         />
         {/* Overlay sombre */}
         <div className="absolute inset-0 bg-black/60"></div>

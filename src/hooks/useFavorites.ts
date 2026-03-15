@@ -35,11 +35,11 @@ export const useFavorites = () => {
     try {
       await authAPI.toggleFavorite(id);
       
-      toast.success(
+      toast(
         wasFavorite 
           ? 'Retiré des favoris' 
           : 'Ajouté aux favoris',
-        { duration: 2000 }
+        { icon: wasFavorite ? "💔" : "❤️", duration: 2000, style: { background: "#3A3A3A", color: "#fff" } }
       );
       
       return true;

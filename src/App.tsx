@@ -21,6 +21,7 @@ import AdminTestimonials from './pages/admin/AdminTestimonials';
 import AdminContent from './pages/admin/AdminContent';
 import AdminCategories from './pages/admin/AdminCategories';
 import AdminNotifications from './pages/admin/AdminNotifications';
+import { Toaster } from "react-hot-toast";
 
 // Lazy load uniquement pour les pages front-end (optimisation SEO/Performance)
 const Home = lazy(() => import('./pages/Home'));
@@ -462,6 +463,7 @@ function App() {
             )}
           </div>
       </>
+      <Toaster position="top-right" toastOptions={{ duration: 3000, style: { background: "#3A3A3A", color: "#fff", padding: "16px", borderRadius: "8px", fontSize: "14px" } }} />
       
       <Suspense fallback={<Loader />}>
         {renderPage()}

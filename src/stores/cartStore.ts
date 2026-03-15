@@ -47,13 +47,13 @@ export const useCartStore = create<CartState>()(
                 ? { ...item, quantity: item.quantity + (product.quantity || 1) }
                 : item
             ),
-            isOpen: true, // Open cart when adding item
+            // isOpen: true, // Auto-open disabled - toast notification instead
           });
         } else {
           // New item
           set({
             items: [...items, { ...product, quantity: product.quantity || 1 }],
-            isOpen: true,
+            // isOpen: true, // Auto-open disabled
           });
         }
       },

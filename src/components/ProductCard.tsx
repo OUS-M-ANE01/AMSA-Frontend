@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { Heart, Eye, ShoppingBag } from 'lucide-react';
 import type{ Product } from '../types';
 
@@ -18,10 +19,9 @@ export default function ProductCard({
 }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
+    toast(`${product.name} ajouté au panier !`, { icon: "🛍️", duration: 3000, style: { background: "#3A3A3A", color: "#fff" } });
     if (onAddToCart) {
       onAddToCart(product._id ?? product.id);
-    } else {
-      alert(`${product.name} ajouté au panier !`);
     }
   };
 
@@ -30,13 +30,15 @@ export default function ProductCard({
     if (onToggleFavorite) {
       onToggleFavorite(product._id ?? product.id);
     } else {
-      alert(`${product.name} ajouté aux favoris !`);
+      toast(`${product.name} ajouté aux favoris !`, { icon: "❤️", duration: 3000, style: { background: "#3A3A3A", color: "#fff" } });
     }
   };
 
   const handleQuickView = (e: React.MouseEvent) => {
     e.stopPropagation();
-    alert(`Aperçu rapide : ${product.name} - ${product.price.toLocaleString()} FCFA`);
+    if (onNavigate) {
+      onNavigate(`product-${product._id ?? product.id}`);
+    }
   };
 
   const handleProductClick = () => {

@@ -9,11 +9,11 @@ export default function TrustStrip() {
   ];
 
   return (
-    <div className="flex flex-wrap justify-center gap-4 md:gap-8 lg:gap-12 px-4 md:px-8 lg:px-14 py-6 md:py-8 border-t border-b border-black bg-black">
+    <div className="flex flex-wrap justify-center gap-3 md:gap-6 lg:gap-12 px-4 md:px-8 lg:px-14 py-4 md:py-6 lg:py-8 border-t border-b border-black bg-black">
       {items.map((item, i) => (
-        <div key={i} className="flex items-center gap-2 md:gap-2.5 text-xs md:text-[13px] tracking-wider text-white">
-          <item.icon size={16} className="text-gold" />
-          {item.text}
+        <div key={i} className="flex items-center gap-2 text-[11px] md:text-[13px] tracking-wider text-white">
+          <item.icon size={18} className="text-gold flex-shrink-0" />
+          <span className="whitespace-nowrap">{item.text}</span>
         </div>
       ))}
     </div>

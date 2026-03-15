@@ -6,9 +6,9 @@ export default function Contact() {
       <div className="relative h-[50vh] flex flex-col items-center justify-center overflow-hidden">
         {/* Image de fond */}
         <img 
-          src="https://images.unsplash.com/photo-1486308510493-aa64833637bc?w=1600&q=80" 
+          src="https://rohitpolymer.com/wp-content/uploads/2024/01/contact-us.png" 
           alt="Contact"
-          className="absolute inset-0 w-full h-full objject-cover"
+          className="absolute inset-0 w-full h-full objject-fit"
         />
         {/* Overlay sombre */}
         <div className="absolute inset-0 bg-black/60"></div>

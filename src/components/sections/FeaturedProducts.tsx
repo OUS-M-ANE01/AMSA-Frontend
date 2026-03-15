@@ -71,7 +71,7 @@ export default function FeaturedProducts({ onNavigate }: FeaturedProductsProps) 
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="animate-pulse">
               <div className="bg-[#E8E0D5] aspect-[3/4] rounded-md mb-3" />
@@ -81,7 +81,7 @@ export default function FeaturedProducts({ onNavigate }: FeaturedProductsProps) 
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7">
           {products.map(product => (
             <ProductCard
               key={String(product._id || product.id)}
