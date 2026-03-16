@@ -101,7 +101,7 @@ export default function Vetements({ onNavigate }: VetementsProps) {
       {/* Filtres */}
       <section className="py-6 md:py-8 px-4 md:px-8 lg:px-14 bg-warm-white border-b border-border">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
+          <div className="flex flex-row items-center justify-between gap-2 sm:gap-4 w-full">
             {/* Bouton Filtres avec dropdown */}
             <div className="relative">
               <button 
@@ -149,7 +149,7 @@ export default function Vetements({ onNavigate }: VetementsProps) {
             </div>
             
             {/* Options rapides */}
-            <div className="flex items-center gap-4 md:gap-6 justify-center flex-1 flex-wrap">
+            <div className="hidden sm:flex items-center gap-4 md:gap-6 justify-center flex-1 flex-wrap">
               {['Tous', ...uniqueCategories].map((cat) => (
                 <button
                   key={cat}
@@ -168,7 +168,7 @@ export default function Vetements({ onNavigate }: VetementsProps) {
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value)}
-              className="text-xs md:text-sm text-charcoal hover:text-gold px-4 py-2 bg-white border-2 border-charcoal hover:border-gold rounded cursor-pointer transition-colors w-full sm:w-auto"
+              className="text-xs md:text-sm text-charcoal hover:text-gold px-4 py-2 bg-white border-2 border-charcoal hover:border-gold rounded cursor-pointer transition-colors flex-shrink-0 w-auto"
             >
               <option value="default">Trier par</option>
               <option value="price-asc">Prix croissant</option>

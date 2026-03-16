@@ -180,9 +180,9 @@ export default function Bijoux({ onNavigate }: BijouxProps) {
       <section className="py-6 md:py-8 px-4 md:px-8 lg:px-14 bg-cream border-y border-border">
         <div className="max-w-7xl mx-auto">
           {/* Filtres rapides et tri */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
+          <div className="flex flex-row items-center justify-between gap-2 sm:gap-4 w-full">
             {/* Bouton Filtres avec dropdown */}
-            <div className="relative">
+            <div className="relative flex-shrink-0">
               <button 
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
                 className="flex items-center gap-2 px-4 py-2 text-xs md:text-sm text-charcoal hover:text-gold transition-colors border-2 border-charcoal hover:border-gold rounded"
@@ -253,7 +253,7 @@ export default function Bijoux({ onNavigate }: BijouxProps) {
             </div>
             
             {/* Options rapides - centrées */}
-            <div className="flex items-center gap-4 md:gap-6 justify-center flex-1 flex-wrap">
+            <div className="hidden sm:flex items-center gap-4 md:gap-6 justify-center flex-1 flex-wrap">
               {['Tous', ...uniqueCategories].map((cat) => (
                 <button
                   key={cat}
@@ -272,7 +272,7 @@ export default function Bijoux({ onNavigate }: BijouxProps) {
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value)}
-              className="text-xs md:text-sm text-charcoal hover:text-gold px-4 py-2 bg-white border-2 border-charcoal hover:border-gold rounded cursor-pointer transition-colors w-full sm:w-auto"
+              className="text-xs md:text-sm text-charcoal hover:text-gold px-4 py-2 bg-white border-2 border-charcoal hover:border-gold rounded cursor-pointer transition-colors flex-shrink-0 w-auto"
             >
               <option value="default">Trier par</option>
               <option value="price-asc">Prix croissant</option>
