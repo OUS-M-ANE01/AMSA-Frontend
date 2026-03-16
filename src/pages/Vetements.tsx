@@ -114,7 +114,7 @@ export default function Vetements({ onNavigate }: VetementsProps) {
               </button>
               
               {isFilterOpen && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 mt-2 bg-white border border-border py-4 px-4 z-20 shadow-xl rounded-sm w-[calc(100vw-2rem)] sm:min-w-[600px] sm:w-auto max-h-[70vh] overflow-y-auto">
+                <div className="absolute top-full left-0 mt-2 bg-white border border-border py-4 px-4 z-20 shadow-xl rounded-sm w-[calc(100vw-2rem)] sm:min-w-[600px] sm:w-auto max-h-[70vh] overflow-y-auto">
                   <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 sm:gap-8">
                     {/* Filtre Catégorie */}
                     <div className="w-full sm:flex-1 sm:min-w-[180px]">
