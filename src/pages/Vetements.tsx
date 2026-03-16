@@ -101,23 +101,23 @@ export default function Vetements({ onNavigate }: VetementsProps) {
       {/* Filtres */}
       <section className="py-6 md:py-8 px-4 md:px-8 lg:px-14 bg-warm-white border-b border-border">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-row items-center justify-between gap-2 sm:gap-4 w-full">
+          <div className="flex flex-row items-center justify-between gap-2 sm:gap-4 w-full min-w-0">
             {/* Bouton Filtres avec dropdown */}
             <div className="relative">
               <button 
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className="flex items-center gap-2 px-4 py-2 text-xs md:text-sm text-charcoal hover:text-gold transition-colors border-2 border-charcoal hover:border-gold rounded"
+                className="flex items-center gap-2 px-4 py-2 h-10 text-xs md:text-sm text-charcoal hover:text-gold transition-colors border-2 border-charcoal hover:border-gold rounded"
               >
                 <SlidersHorizontal className="w-4 h-4" />
-                <span className="uppercase tracking-wider">Filtres</span>
+                <span className="uppercase tracking-wider whitespace-nowrap">Filtres</span>
                 <ChevronDown className={`w-3 h-3 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
               </button>
               
               {isFilterOpen && (
-                <div className="absolute top-full left-0 mt-2 bg-white border border-border py-6 px-6 z-20 shadow-xl rounded-sm min-w-[600px]">
-                  <div className="flex flex-wrap gap-8">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 mt-2 bg-white border border-border py-4 px-4 z-20 shadow-xl rounded-sm w-[calc(100vw-2rem)] sm:min-w-[600px] sm:w-auto max-h-[70vh] overflow-y-auto">
+                  <div className="flex flex-col sm:flex-row sm:flex-wrap gap-4 sm:gap-8">
                     {/* Filtre Catégorie */}
-                    <div className="flex-1 min-w-[180px]">
+                    <div className="w-full sm:flex-1 sm:min-w-[180px]">
                       <h3 className="text-charcoal font-medium text-xs uppercase tracking-[0.2em] mb-3">Catégorie</h3>
                       <div className="space-y-2">
                         {['Tous', ...uniqueCategories].map((cat) => (
@@ -132,7 +132,7 @@ export default function Vetements({ onNavigate }: VetementsProps) {
                     </div>
 
                     {/* Filtre Prix */}
-                    <div className="flex-1 min-w-[180px]">
+                    <div className="w-full sm:flex-1 sm:min-w-[180px]">
                       <h3 className="text-charcoal font-medium text-xs uppercase tracking-[0.2em] mb-3">Prix</h3>
                       <div className="space-y-2">
                         {['Moins de 30 000 FCFA', '30 000 - 65 000 FCFA', '65 000 - 130 000 FCFA', 'Plus de 130 000 FCFA'].map((price) => (
@@ -168,7 +168,7 @@ export default function Vetements({ onNavigate }: VetementsProps) {
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value)}
-              className="text-xs md:text-sm text-charcoal hover:text-gold px-4 py-2 bg-white border-2 border-charcoal hover:border-gold rounded cursor-pointer transition-colors flex-shrink-0 w-auto"
+              className="text-xs md:text-sm text-charcoal hover:text-gold px-4 py-2 h-10 bg-white border-2 border-charcoal hover:border-gold rounded cursor-pointer transition-colors flex-shrink-0 w-auto"
             >
               <option value="default">Trier par</option>
               <option value="price-asc">Prix croissant</option>
