@@ -12,6 +12,8 @@ import {
   Search,
   Home,
   Tag,
+  Image,
+  Mail,
 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import toast from "react-hot-toast";
@@ -35,6 +37,7 @@ function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutProps) {
     { id: "admin-orders", label: "Commandes", icon: ShoppingCart },
     { id: "admin-users", label: "Utilisateurs", icon: Users },
     { id: "admin-notifications", label: "Notifications", icon: Settings },
+    { id: "admin-newsletter", label: "Newsletter", icon: Mail },
     { id: "separator-1", label: "separator", icon: null },
     { id: "admin-content", label: "Contenu Site", icon: FileText },
     { id: "separator-2", label: "separator", icon: null },
@@ -77,19 +80,19 @@ function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutProps) {
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         } ${
           sidebarOpen ? "w-64" : "lg:w-20 w-64"
-        } fixed left-0 top-0 h-screen bg-[#3A3A3A] text-white transition-all duration-300 flex flex-col shadow-2xl z-50 overflow-hidden`}
+        } fixed left-0 top-0 h-screen bg-[#3A3A3A] text-white transition-all duration-300 flex flex-col shadow-2xl z-50 `}
       >
         {/* Logo */}
         <div className="p-4 border-b border-[#6B6B6B]">
           <div className="flex items-center justify-between">
             {sidebarOpen && (
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#8B7355] rounded-xl flex items-center justify-center shadow-md">
+                <div className="w-10 h-10 bg-[#c9a96e] rounded-xl flex items-center justify-center shadow-md">
                   <Package className="text-white" size={20} />
                 </div>
                 <div>
                   <h1 className="text-lg font-bold text-white">
-                    Eva<span className="text-[#8B7355]">Styl</span>
+                    AS<span className="text-[#c9a96es]">'MA</span>
                   </h1>
                   <p className="text-xs text-[#9B9B9B]">Administration</p>
                 </div>
@@ -106,7 +109,7 @@ function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-2.5 space-y-1">
+        <nav className="flex-1 p-2 space-y-1.5">
           {menuItems.map((item) => {
             if (item.label === "separator") {
               return (
@@ -132,7 +135,7 @@ function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutProps) {
                     onNavigate(item.id);
                   }
                 }}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all group relative overflow-hidden ${
+                className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-xl transition-all group relative overflow-hidden ${
                   isBackButton
                     ? "text-[#E8E0D5] hover:bg-[#4A4A4A] hover:text-white border-t border-[#6B6B6B]/30 mt-auto"
                     : isActive
@@ -141,7 +144,7 @@ function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutProps) {
                 }`}
               >
                 <div
-                  className={`relative flex items-center justify-center w-9 h-9 rounded-lg transition-all ${
+                  className={`relative flex items-center justify-center w-8 h-8 rounded-lg transition-all ${
                     isActive
                       ? "bg-white/10"
                       : "bg-[#4A4A4A]/30 group-hover:bg-[#6B6B6B]"
@@ -150,7 +153,7 @@ function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutProps) {
                   <Icon size={18} className="flex-shrink-0 relative z-10" />
                 </div>
                 {sidebarOpen && (
-                  <span className="font-medium text-sm relative z-10">
+                  <span className="font-medium text-xs relative z-10">
                     {item.label}
                   </span>
                 )}

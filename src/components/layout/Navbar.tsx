@@ -50,7 +50,7 @@ export default function Navbar({ currentPage, onNavigate, onSearchOpen, onCartOp
           onClick={() => handleNavigation('accueil')}
           className="flex items-center gap-3 font-serif text-xl md:text-[26px] font-semibold tracking-wider text-charcoal hover:opacity-80 transition-opacity"
         >
-          <img src="/AMSA.png" alt="ASMA Logo" className="w-24 h-24 object-contain mr-2" />
+          <img src="/ASMA.png" alt="ASMA Logo" className="w-24 h-24 object-contain mr-2" />
         </button>
 
         {/* Menu Desktop */}

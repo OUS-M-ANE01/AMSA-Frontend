@@ -7,7 +7,11 @@ interface CheckoutProps {
   onNavigate: (page: string) => void;
 }
 
-
+const DELIVERY_OPTIONS = [
+  { id: 'standard', label: 'Standard (3-5 jours)', price: 0, displayPrice: 'Gratuit' },
+  { id: 'express', label: 'Express (1-2 jours)', price: 6500, displayPrice: '6 500 FCFA' },
+  { id: 'premium', label: 'Premium (24h)', price: 9800, displayPrice: '9 800 FCFA' },
+];
 
 // Méthodes NabooPay
 type NabooMethod = 'WAVE' | 'ORANGE_MONEY' | 'FREE_MONEY' | 'EXPRESSO' | 'CARD';
@@ -21,9 +25,33 @@ const PAYMENT_METHODS: { id: NabooMethod; label: string; color: string; logo: st
   },
   {
     id: 'ORANGE_MONEY',
+  {
+    id: 'CARD',
+    label: 'Carte Bancaire',
+    color: '#1E3A8A',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/320px-Visa_Inc._logo.svg.png',
+  },
     label: 'Orange Money',
+  {
+    id: 'CARD',
+    label: 'Carte Bancaire',
+    color: '#1E3A8A',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/320px-Visa_Inc._logo.svg.png',
+  },
     color: '#FF6600',
+  {
+    id: 'CARD',
+    label: 'Carte Bancaire',
+    color: '#1E3A8A',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/320px-Visa_Inc._logo.svg.png',
+  },
     logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Orange_Money_logo.png/320px-Orange_Money_logo.png',
+  {
+    id: 'CARD',
+    label: 'Carte Bancaire',
+    color: '#1E3A8A',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/320px-Visa_Inc._logo.svg.png',
+  },
   },
   {
     id: 'CARD',
@@ -39,11 +67,13 @@ export default function Checkout({ onNavigate: _onNavigate }: CheckoutProps) {
   const [form, setForm] = useState({
     prenom: '', nom: '', adresse: '', ville: '', telephone: '', email: '',
   });
+  const [selectedDelivery, setSelectedDelivery] = useState(0);
   const [selectedPayment, setSelectedPayment] = useState<NabooMethod>('WAVE');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const total = totalPrice;
+  const deliveryCost = DELIVERY_OPTIONS[selectedDelivery].price;
+  const total = totalPrice + deliveryCost;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -84,7 +114,7 @@ export default function Checkout({ onNavigate: _onNavigate }: CheckoutProps) {
           email: form.email || undefined,
         },
         paymentMethods: [selectedPayment],
-        deliveryCost: 0,
+        deliveryCost,
       });
 
       const { checkoutUrl } = res.data;
@@ -187,7 +217,33 @@ export default function Checkout({ onNavigate: _onNavigate }: CheckoutProps) {
                 </form>
               </div>
 
-              
+              {/* ── Mode de livraison ── */}
+              <div>
+                <h2 className="font-serif text-2xl font-light text-charcoal mb-4">
+                  Mode de <em className="italic text-gold">livraison</em>
+                </h2>
+                <div className="space-y-3">
+                  {DELIVERY_OPTIONS.map((option, i) => (
+                    <label
+                      key={option.id}
+                      className={`flex items-center justify-between p-4 border cursor-pointer transition-colors ${
+                        selectedDelivery === i ? 'border-gold bg-gold/5' : 'border-border hover:border-gold/50'
+                      }`}
+                      onClick={() => setSelectedDelivery(i)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                          selectedDelivery === i ? 'border-gold' : 'border-border'
+                        }`}>
+                          {selectedDelivery === i && <div className="w-2.5 h-2.5 bg-gold rounded-full" />}
+                        </div>
+                        <span className="text-sm text-charcoal">{option.label}</span>
+                      </div>
+                      <span className="text-sm font-medium text-charcoal">{option.displayPrice}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
 
               {/* ── Méthode de paiement NabooPay ── */}
               <div>
@@ -284,7 +340,12 @@ export default function Checkout({ onNavigate: _onNavigate }: CheckoutProps) {
                     <span className="text-text-light">Sous-total</span>
                     <span className="text-charcoal font-medium">{totalPrice.toLocaleString()} FCFA</span>
                   </div>
-                  
+                  <div className="flex justify-between text-sm">
+                    <span className="text-text-light">Livraison</span>
+                    <span className="text-charcoal font-medium">
+                      {deliveryCost === 0 ? 'Gratuit' : `${deliveryCost.toLocaleString()} FCFA`}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex justify-between mb-2">

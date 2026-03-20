@@ -35,10 +35,10 @@ interface Stats {
 }
 
 export const useAdmin = () => {
-  const {
-    stats,
+  const { 
+    stats, 
     statsLastUpdated,
-    salesData,
+    salesData, 
     salesPeriod,
     salesLastUpdated,
     isLoadingStats,
@@ -62,11 +62,11 @@ export const useAdmin = () => {
 
     setLoadingStats(true);
     setError(null);
-
+    
     try {
       const response = await adminAPI.getStats();
       const backendData = response.data.data;
-
+      
       // Mapper les données du backend vers la structure attendue par le frontend
       const mappedData: Stats = {
         totalUsers: backendData.overview.totalUsers,
@@ -77,7 +77,7 @@ export const useAdmin = () => {
         lowStockProducts: backendData.lowStockProducts || [],
         recentOrders: backendData.recentOrders || [],
       };
-
+      
       setStats(mappedData);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erreur lors du chargement');
@@ -87,38 +87,21 @@ export const useAdmin = () => {
 
   const fetchSalesData = async (period: 'week' | 'month' | 'year', forceRefresh = false) => {
     // Utiliser le cache si la période est la même et le cache est valide
-    if (!forceRefresh &&
-        salesPeriod === period &&
-        salesLastUpdated &&
+    if (!forceRefresh && 
+        salesPeriod === period && 
+        salesLastUpdated && 
         Date.now() - salesLastUpdated < SALES_CACHE_DURATION) {
       console.log(`📈 Utilisation du cache pour les ventes (${period})`);
       return { success: true, data: salesData };
     }
 
     setLoadingSales(true);
-
+    
     try {
       const response = await adminAPI.getSalesData(period);
       console.log('📈 Données de vente reçues:', response.data);
-
-      // Transformer salesByDay pour le graphique
-      const transformedSalesData = response.data.data.salesByDay?.map((item: any) => {
-        // Créer une date lisible pour l'axe X
-        const date = new Date(item._id.year, item._id.month - 1, item._id.day);
-        const label = date.toLocaleDateString('fr-FR', { 
-          day: '2-digit', 
-          month: 'short' 
-        });
-        
-        return {
-          _id: label,
-          totalSales: item.totalSales,
-          orderCount: item.orderCount
-        };
-      }) || [];
-
-      setSalesData(transformedSalesData, period);
-      return { success: true, data: transformedSalesData };
+      setSalesData(response.data.data, period);
+      return { success: true, data: response.data.data };
     } catch (err: any) {
       setLoadingSales(false);
       return {

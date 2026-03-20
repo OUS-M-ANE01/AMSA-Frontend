@@ -5,8 +5,9 @@ import { Save, Loader2, Home, ImageIcon, Instagram as InstagramIcon, MessageSqua
 import { productsAPI } from '../../services/api';
 import { adaptApiProduct } from '../../hooks/usePublicProducts';
 import toast, { Toaster } from 'react-hot-toast';
+import PageBannersTab from '../../components/admin/PageBannersTab';
 
-type Section = 'hero' | 'banner' | 'instagram' | 'testimonials' | 'produits';
+type Section = 'hero' | 'banner' | 'instagram' | 'testimonials' | 'produits' | 'page-banners';
 
 interface Testimonial {
   _id: string;
@@ -266,6 +267,7 @@ export default function AdminContent() {
     { id: 'banner' as Section, label: 'Banner', icon: ImageIcon },
     { id: 'instagram' as Section, label: 'Instagram', icon: InstagramIcon },
     { id: 'testimonials' as Section, label: 'Témoignages', icon: MessageSquareQuote },
+    { id: 'page-banners' as Section, label: 'Bannières Pages', icon: ImageIcon },
     { id: 'produits' as Section, label: 'Produits à la une', icon: Package },
   ];
 
@@ -590,7 +592,7 @@ export default function AdminContent() {
           )}
           {/* Testimonials Section */}
           {activeSection === 'testimonials' && (
-            <div className="space-y-6">
+            <div className="space-y-0">
               {/* Sub-header with add button */}
               <div className="flex items-center justify-between">
                 <p className="text-[#6B6B6B]">
@@ -925,6 +927,11 @@ export default function AdminContent() {
                 </>
               )}
             </div>
+          )}
+
+          {/* Bannières Pages Section */}
+          {activeSection === 'page-banners' && (
+            <PageBannersTab />
           )}
         </>
       )}

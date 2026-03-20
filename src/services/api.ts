@@ -204,6 +204,11 @@ export const ordersAPI = {
   updateStatus: (id: string, status: string) =>
     api.put(`/orders/${id}/status`, { status }),
 
+
+  retryPayment: (id: string) => api.post(`/orders/${id}/retry-payment`),
+
+  delete: (id: string) => api.delete(`/orders/${id}`),
+
   markAsPaid: (id: string) => api.put(`/orders/${id}/pay`),
 };
 
@@ -219,7 +224,7 @@ export const paymentAPI = {
       prenom: string; nom: string; adresse: string;
       ville: string; telephone: string; email?: string;
     };
-    paymentMethods: ('WAVE' | 'ORANGE_MONEY' | 'FREE_MONEY' | 'EXPRESSO')[];
+    paymentMethods: ('WAVE' | 'ORANGE_MONEY' | 'FREE_MONEY' | 'EXPRESSO' | 'CARD')[];
     deliveryCost: number;
   }) => api.post<{ success: boolean; checkoutUrl: string; orderId: string; nabooOrderId: string }>(
     '/payment/init', data
@@ -269,6 +274,28 @@ export const adminAPI = {
 
   // Notifications
   getNotifications: () => api.get('/admin/notifications'),
+
+  // Contact
+  sendContactMessage: (data: {
+    nom: string;
+    prenom?: string;
+    email: string;
+    telephone?: string;
+    sujet: string;
+    message: string;
+  }) => api.post('/contact/send', data),
+  
+  getContactInfo: () => api.get('/contact/info'),
+  
+  // Page Banners
+  getAllPageBanners: () => api.get('/admin/page-banners'),
+  updatePageBanner: (page: string, data: any) => api.put(`/admin/page-banners/${page}`, data),
+  initDefaultBanners: () => api.post('/admin/page-banners/init'),
 };
 
 export default api;
+
+// ============= PAGE BANNERS (PUBLIC) =============
+export const pageBannersAPI = {
+  getByPage: (page: string) => api.get(`/page-banners/${page}`),
+};

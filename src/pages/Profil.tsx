@@ -1,4 +1,4 @@
-import { User, Mail, Phone, Lock, Package, Loader2, LogOut, ShoppingBag, Clock, CheckCircle, XCircle, ChevronDown, TrendingUp, AlertCircle } from 'lucide-react';
+import { User, Mail, Phone, Lock, Package, Loader2, LogOut, ShoppingBag, Clock, CheckCircle, XCircle, ChevronDown, TrendingUp, AlertCircle, CreditCard, Ban, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { ordersAPI } from '../services/api';
@@ -13,15 +13,15 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
 
 function StatCard({ icon: Icon, label, value, sub }: { icon: any; label: string; value: string | number; sub?: string }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-white border border-[#e8e2d9] p-5 shadow-sm hover:shadow-md transition-shadow group">
+    <div className="relative overflow-hidden rounded-2xl bg-white border border-[#e8e2d9] p-3 sm:p-5 shadow-sm hover:shadow-md transition-shadow group">
       <div className="absolute top-0 right-0 w-20 h-20 bg-[#C9A84C]/5 rounded-full -translate-y-6 translate-x-6 group-hover:scale-150 transition-transform duration-500" />
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#C9A84C]/10 flex items-center justify-center shrink-0">
+        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#C9A84C]/10 flex items-center justify-center shrink-0">
           <Icon size={18} className="text-[#C9A84C]" />
         </div>
         <div>
           <p className="text-xs text-[#8B7355] uppercase tracking-widest font-medium mb-1">{label}</p>
-          <p className="text-2xl font-serif font-semibold text-[#2C2C2C]">{value}</p>
+          <p className="text-xl sm:text-2xl font-serif font-semibold text-[#2C2C2C]">{value}</p>
           {sub && <p className="text-xs text-[#8B7355] mt-0.5">{sub}</p>}
         </div>
       </div>
@@ -29,19 +29,75 @@ function StatCard({ icon: Icon, label, value, sub }: { icon: any; label: string;
   );
 }
 
-function OrderCard({ order }: { order: any }) {
+function OrderCard({ order, onOrderUpdate }: { order: any; onOrderUpdate: () => void }) {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const status = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending;
   const StatusIcon = status.icon;
+
+  const handleRetryPayment = async () => {
+    try {
+      setLoading(true);
+      const response = await ordersAPI.retryPayment(order._id);
+      if (response.data.success && response.data.checkoutUrl) {
+        window.location.href = response.data.checkoutUrl;
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Erreur lors de la réinitialisation du paiement');
+      toast.error(error.response?.data?.message || "Erreur lors de la réinitialisation du paiement");
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!confirm('Êtes-vous sûr de vouloir annuler cette commande ?')) return;
+    try {
+      setLoading(true);
+      await ordersAPI.cancel(order._id);
+      toast.success('Commande annulée avec succès');
+      onOrderUpdate();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Erreur lors de l'annulation");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer définitivement cette commande ?')) return;
+    try {
+      setLoading(true);
+      await ordersAPI.delete(order._id);
+      toast.success('Commande supprimée avec succès');
+      onOrderUpdate();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Erreur lors de la suppression");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isPending = order.status === 'pending';
+  const isConfirmed = order.status === 'confirmed';
+  const isDelivered = order.status === 'delivered';
+  const isCancelled = order.status === 'cancelled';
+  
+  // Peut payer si en attente et non payé
+  const canPay = isPending && !order.isPaid;
+  
+  // Peut annuler si en attente OU confirmé (mais pas livré ou déjà annulé)
+  const canCancel = (isPending || isConfirmed) && !isCancelled && !isDelivered;
+  
+  // Peut supprimer si en attente et non payé
+  const canDelete = isPending && !order.isPaid;
 
   return (
     <div className="bg-white border border-[#e8e2d9] rounded-2xl overflow-hidden hover:border-[#C9A84C]/50 hover:shadow-md transition-all duration-300">
       <div
-        className="flex items-center gap-4 p-4 cursor-pointer select-none"
+        className="flex items-center gap-2 sm:gap-4 p-3 sm:p-4 cursor-pointer select-none"
         onClick={() => setOpen(!open)}
       >
         {/* Order icon */}
-        <div className="w-10 h-10 rounded-xl bg-[#C9A84C]/10 flex items-center justify-center shrink-0">
+        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#C9A84C]/10 flex items-center justify-center shrink-0">
           <ShoppingBag size={18} className="text-[#C9A84C]" />
         </div>
 
@@ -95,6 +151,68 @@ function OrderCard({ order }: { order: any }) {
             <span className="text-xs text-[#8B7355]">Total commande</span>
             <span className="font-serif font-semibold text-[#C9A84C]">{order.total?.toLocaleString('fr-FR')} FCFA</span>
           </div>
+          {/* Statut de remboursement */}
+          {order.isRefunded && (
+            <div className="mt-3 pt-3 border-t border-[#e8e2d9]">
+              <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+                <CheckCircle size={16} className="text-blue-600" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-blue-900">Commande remboursée</p>
+                  <p className="text-xs text-blue-700">
+                    Montant: {order.refundAmount?.toLocaleString('fr-FR')} FCFA
+                    {order.refundedAt && ` • ${new Date(order.refundedAt).toLocaleDateString('fr-FR')}`}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          {/* Boutons d'action */}
+          {(canPay || canCancel || canDelete) && (
+            <div className="mt-4 pt-4 border-t border-[#e8e2d9] flex flex-col sm:flex-row gap-2">
+              {canPay && (
+                <button
+                  onClick={handleRetryPayment}
+                  disabled={loading}
+                  className="flex-1 min-w-[100px] sm:min-w-[120px] px-4 py-2 bg-[#C9A84C] text-white rounded-lg hover:bg-[#B8973D] transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                >
+                  {loading ? 'Chargement...' : (
+                    <>
+                      <CreditCard size={16} />
+                      <span>Payer</span>
+                    </>
+                  )}
+                </button>
+              )}
+              {canCancel && (
+                <button
+                  onClick={handleCancel}
+                  disabled={loading}
+                  className="flex-1 min-w-[100px] sm:min-w-[120px] px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                >
+                  {loading ? 'Chargement...' : (
+                    <>
+                      <Ban size={16} />
+                      <span>Annuler</span>
+                    </>
+                  )}
+                </button>
+              )}
+              {canDelete && (
+                <button
+                  onClick={handleDelete}
+                  disabled={loading}
+                  className="flex-1 min-w-[100px] sm:min-w-[120px] px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                >
+                  {loading ? 'Chargement...' : (
+                    <>
+                      <Trash2 size={16} />
+                      <span>Supprimer</span>
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -130,6 +248,19 @@ export default function Profil() {
 
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
+
+  const fetchOrders = async () => {
+    try {
+      const response = await ordersAPI.getMyOrders();
+      if (response.data.success) {
+        setOrders(response.data.data);
+      }
+    } catch (error) {
+      toast.error("Erreur lors du chargement des commandes");
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
   const [activeTab, setActiveTab] = useState<'orders' | 'profile'>('orders');
 
   useEffect(() => {
@@ -142,18 +273,6 @@ export default function Profil() {
   }, [loading, isAuthenticated, user]);
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await ordersAPI.getMyOrders();
-        if (response.data.success) {
-          setOrders(response.data.data);
-        }
-      } catch (error) {
-        toast.error('Erreur lors du chargement des commandes');
-      } finally {
-        setOrdersLoading(false);
-      }
-    };
     if (user) fetchOrders();
   }, [user]);
 
@@ -186,11 +305,11 @@ export default function Profil() {
         {/* Soft glow */}
         <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-64 h-32 bg-[#C9A84C]/10 blur-3xl rounded-full pointer-events-none" />
 
-        <div className="relative px-4 md:px-18 py-10">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+        <div className="relative px-4 md:px-18 py-6 sm:py-10">
+          <div className="flex flex-row items-start gap-3 sm:gap-6">
             {/* Avatar */}
             <div className="relative">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#C9A84C] to-[#a8883c] flex items-center justify-center text-white text-3xl font-serif font-semibold shadow-lg shadow-[#C9A84C]/20">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#C9A84C] to-[#a8883c] flex items-center justify-center text-white text-2xl sm:text-3xl font-serif font-semibold shadow-lg shadow-[#C9A84C]/20">
                 {user.prenom?.[0]?.toUpperCase() || 'U'}
               </div>
               <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-400 border-2 border-[#2C2C2C]" title="Connecté" />
@@ -199,16 +318,17 @@ export default function Profil() {
             {/* Info */}
             <div className="flex-1">
               <p className="text-[#C9A84C] text-xs uppercase tracking-widest font-medium mb-1">Mon espace</p>
-              <h1 className="text-white font-serif text-2xl md:text-3xl font-semibold leading-tight">
+              <h1 className="text-white font-serif text-base sm:text-2xl md:text-3xl font-semibold leading-tight">
                 {user.prenom} {user.nom}
               </h1>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
-                <span className="flex items-center gap-1.5 text-[#a8883c] text-sm">
-                  <Mail size={13} /> {user.email}
+              <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-1 sm:gap-x-4 sm:gap-y-1 mt-1 sm:mt-2">
+                <span className="flex items-center gap-1 text-[#a8883c] text-xs sm:text-sm">
+                  <Mail size={12} className="shrink-0" /> 
+                  <span className="truncate">{user.email}</span>
                 </span>
                 {user.telephone && (
-                  <span className="flex items-center gap-1.5 text-[#a8883c] text-sm">
-                    <Phone size={13} /> {user.telephone}
+                  <span className="flex items-center gap-1 text-[#a8883c] text-xs sm:text-sm">
+                    <Phone size={12} className="shrink-0" /> {user.telephone}
                   </span>
                 )}
               </div>
@@ -217,7 +337,7 @@ export default function Profil() {
            {/* Logout Button */}
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#3A3A3A] hover:bg-[#8B7355] text-white rounded-xl transition-all group shadow-md hover:shadow-lg"
+                className="flex items-center justify-center gap-2 px-2 sm:px-4 py-2 sm:py-2.5 bg-[#3A3A3A] hover:bg-[#8B7355] text-white rounded-xl transition-all group shadow-md hover:shadow-lg shrink-0"
               >
                 <LogOut
                   size={16}
@@ -268,10 +388,10 @@ export default function Profil() {
       </div>
 
       {/* ── Content ── */}
-      <div className=" md:max-w-6xl mx-auto py-8">
+      <div className=" max-w-6xl mx-auto py-4 sm:py-8 px-3 sm:px-4">
 
         {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 mb-4 sm:mb-8">
           <StatCard icon={ShoppingBag} label="Commandes" value={orders.length} />
           <StatCard icon={CheckCircle} label="Confirmées" value={confirmedOrders} />
           <StatCard icon={Clock} label="En attente" value={pendingOrders} />
@@ -279,7 +399,7 @@ export default function Profil() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 p-1 bg-white border border-[#e8e2d9] rounded-xl mb-6 w-fit shadow-sm">
+        <div className="flex gap-1 p-1 bg-white border border-[#e8e2d9] rounded-xl mb-4 sm:mb-6 w-fit shadow-sm">
           {[
             { key: 'orders', label: 'Mes commandes', icon: Package },
             { key: 'profile', label: 'Mon profil', icon: User },
@@ -287,7 +407,7 @@ export default function Profil() {
             <button
               key={key}
               onClick={() => setActiveTab(key as any)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+              className={`flex items-center gap-2 px-3 py-2 sm:px-5 sm:py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                 activeTab === key
                   ? 'bg-[#C9A84C] text-white shadow-sm'
                   : 'text-[#8B7355] hover:text-[#2C2C2C] hover:bg-[#faf8f5]'
@@ -326,7 +446,7 @@ export default function Profil() {
                 </div>
                 <div className="space-y-3">
                   {orders.map((order) => (
-                    <OrderCard key={order._id} order={order} />
+                    <OrderCard key={order._id} order={order} onOrderUpdate={fetchOrders} />
                   ))}
                 </div>
               </>

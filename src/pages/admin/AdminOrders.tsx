@@ -41,6 +41,7 @@ interface Order {
   paymentMethod: string;
   shippingAddress: any;
   createdAt: string;
+  refundedAt?: string;
 }
 
 export default function AdminOrders() {
@@ -99,8 +100,28 @@ export default function AdminOrders() {
   const fetchStats = useCallback(async () => {
     try {
       const response = await adminAPI.getStats();
-      setStats(response.data.data);
-    } catch (error) {
+      const data = response.data.data;
+      
+      // Calculer les commandes confirmées/livrées et en attente depuis ordersByStatus
+      const ordersByStatus = data.ordersByStatus || [];
+      const confirmedOrders = ordersByStatus
+        .filter((s: any) => ['confirmed', 'shipped', 'delivered'].includes(s._id))
+        .reduce((sum: number, s: any) => sum + s.count, 0);
+      const pendingOrders = ordersByStatus
+        .filter((s: any) => s._id === 'pending')
+        .reduce((sum: number, s: any) => sum + s.count, 0);
+      
+      console.log('📊 Confirmées:', confirmedOrders, 'En attente:', pendingOrders);
+      
+      // Combiner overview avec les stats calculées
+      setStats({
+        ...data.overview,
+        confirmedOrders,
+        pendingOrders
+      });
+    } catch (error: any) {
+      console.error('❌ Erreur stats:', error.response?.data || error.message);
+      toast.error('Erreur lors du chargement des statistiques');
       setStats(null);
     }
   }, []);
@@ -235,7 +256,7 @@ export default function AdminOrders() {
           {[
             {
               title: 'Revenu total',
-              value: `${stats.totalRevenue?.toLocaleString('fr-FR') ?? 0} FCFA`,
+              value: `${stats?.totalRevenue?.toLocaleString('fr-FR') || 0} FCFA`,
               icon: Package,
               color: 'text-[#065F46]',
               bgColor: 'bg-[#D1FAE5]',
@@ -243,7 +264,7 @@ export default function AdminOrders() {
             },
             {
               title: 'Commandes',
-              value: stats.totalOrders,
+              value: stats?.totalOrders || 0,
               icon: ShoppingCart,
               color: 'text-[#8B7355]',
               bgColor: 'bg-[#F5F1ED]',
@@ -251,7 +272,7 @@ export default function AdminOrders() {
             },
             {
               title: 'Confirmées/Livrées',
-              value: stats.confirmedOrders,
+              value: stats?.confirmedOrders || 0,
               icon: Loader2,
               color: 'text-[#92400E]',
               bgColor: 'bg-[#FEF3C7]',
@@ -259,7 +280,7 @@ export default function AdminOrders() {
             },
             {
               title: 'En attente',
-              value: stats.pendingOrders,
+              value: stats?.pendingOrders || 0,
               icon: Loader2,
               color: 'text-[#8B7355]',
               bgColor: 'bg-[#F5F1ED]',
@@ -384,7 +405,16 @@ export default function AdminOrders() {
                     <div className="flex flex-col gap-0.5">
                       <span className="text-xs text-[#6B6B6B]">{order.paymentMethod}</span>
                       {order.isPaid ? (
-                        <span className="text-xs text-[#065F46] font-medium">Payé ✓</span>
+                        <>
+                          <span className="text-xs font-medium text-[#065F46]">
+                            Payé ✓
+                          </span>
+                          {false && (
+                            <span className="text-xs text-blue-600 font-medium ml-1">
+                              (Remboursé)
+                            </span>
+                          )}
+                        </>
                       ) : (
                         (order.status !== 'cancelled' && order.status !== 'delivered') && (
                           <button
@@ -460,7 +490,7 @@ export default function AdminOrders() {
           <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-[#E8E0D5] flex-shrink-0">
               <h3 className="text-2xl font-bold text-[#3A3A3A]">
-                Commande {selectedOrder.orderNumber}
+                Commande {selectedOrder!.orderNumber}
               </h3>
               <button
                 onClick={() => setShowDetailsModal(false)}
@@ -526,8 +556,8 @@ export default function AdminOrders() {
                 </div>
                 <div className="mt-1 flex items-center justify-between text-sm">
                   <span className="text-[#6B6B6B]">Paiement</span>
-                  <span className={selectedOrder.isPaid ? 'text-[#065F46] font-medium' : 'text-[#C53030]'}>
-                    {selectedOrder.isPaid ? 'Payé ✓' : 'Non payé'}
+                  <span className={selectedOrder!.isPaid ? 'text-[#065F46] font-medium' : 'text-[#C53030]'}>
+                    {selectedOrder!.isPaid ? 'Payé ✓' : 'Non payé'}
                   </span>
                 </div>
               </div>

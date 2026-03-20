@@ -21,6 +21,8 @@ import AdminTestimonials from './pages/admin/AdminTestimonials';
 import AdminContent from './pages/admin/AdminContent';
 import AdminCategories from './pages/admin/AdminCategories';
 import AdminNotifications from './pages/admin/AdminNotifications';
+import AdminNewsletter from './pages/admin/AdminNewsletter';
+import AdminPageBanners from './pages/admin/AdminPageBanners';
 import { Toaster } from "react-hot-toast";
 
 // Lazy load uniquement pour les pages front-end (optimisation SEO/Performance)
@@ -54,7 +56,7 @@ const updateHash = (page: string) => {
   window.location.hash = page;
 };
 
-type PageType = 'accueil' | 'soldes' | 'vetements' | 'bijoux' | 'apropos' | 'contact' | 'favoris' | 'profil' | 'panier' | 'checkout' | 'auth' | 'admin-dashboard' | 'admin-products' | 'admin-orders' | 'admin-users' | 'admin-settings' | 'admin-testimonials' | 'admin-content' | 'admin-notifications' | string;
+type PageType = 'accueil' | 'soldes' | 'vetements' | 'bijoux' | 'apropos' | 'contact' | 'favoris' | 'profil' | 'panier' | 'checkout' | 'auth' | 'admin-dashboard' | 'admin-products' | 'admin-orders' | 'admin-users' | 'admin-settings' | 'admin-testimonials' | 'admin-content' | 'admin-notifications' | 'admin-newsletter' | string;
 
 function App() {
   // Initialiser avec la page depuis l'URL
@@ -164,8 +166,15 @@ function App() {
         case 'admin-content':
           adminContent = <AdminContent />;
           break;
+        case 'admin-page-banners':
+          adminContent = <AdminPageBanners />;
+          adminContent = <AdminContent />;
+          break;
         case 'admin-notifications':
           adminContent = <AdminNotifications />;
+          break;
+        case 'admin-newsletter':
+          adminContent = <AdminNewsletter />;
           break;
         default:
           adminContent = <AdminDashboard />;
@@ -456,7 +465,7 @@ function App() {
                     Passer la commande
                   </button>
                   <p className="text-xs text-text-light text-center mt-2">
-                    Livraison et taxes calculées à la prochaine étape
+                    Taxes incluses dans le prix affiché
                   </p>
                 </div>
               </>

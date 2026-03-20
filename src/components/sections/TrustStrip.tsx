@@ -2,7 +2,7 @@ import { Truck, ShieldCheck, RotateCcw, Gem } from 'lucide-react';
 
 export default function TrustStrip() {
   const items = [
-    { icon: Truck, text: 'Livraison offerte dès 52 000 FCFA' },
+    { icon: Truck, text: 'Paiement sécurisé' },
     { icon: ShieldCheck, text: 'Paiement 100% sécurisé' },
     { icon: RotateCcw, text: 'Retours gratuits 30 jours' },
     { icon: Gem, text: 'Matières sélectionnées' }

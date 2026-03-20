@@ -31,19 +31,15 @@ export default function Apropos() {
                 Notre <em className="italic text-gold">Histoire</em>
               </h2>
               <p className="text-text-light mb-4 leading-relaxed">
-                ASMA est née d'une passion pour la mode et les bijoux, dans un petit atelier du Marais à Paris. 
-                Ce qui a commencé comme un rêve est devenu une maison de création reconnue pour ses pièces élégantes 
-                et intemporelles.
+                ASMA est née d'une passion pour la mode et les bijoux, à Dakar, au Sénégal. Ce qui a commencé comme un rêve local est devenu une boutique reconnue pour sa sélection de pièces élégantes, modernes et intemporelles, choisies avec soin auprès de créateurs et de marques de qualité.
               </p>
               <p className="text-text-light leading-relaxed">
-                Aujourd'hui, nous continuons de créer chaque pièce avec le même amour du détail et de la qualité, 
-                en privilégiant les matériaux nobles et le savoir-faire artisanal français. Notre engagement ? 
-                Offrir à chaque femme des créations qui la subliment et l'accompagnent au fil des saisons.
+                Aujourd'hui, nous continuons de sélectionner chaque article avec le même amour du détail et de la qualité, en privilégiant les matériaux nobles et les tendances qui subliment la femme sénégalaise. Notre engagement ? Offrir à chaque cliente des collections qui l'accompagnent au fil des saisons, en valorisant l'élégance, la diversité et l'accessibilité.
               </p>
             </div>
             <div className="relative">
               <img 
-                src="/eva-about.png" 
+                src="/asma-about.jpeg" 
                 alt="Atelier ASMA" 
                 className="w-full aspect-[4/5] object-contain"
               />
@@ -68,7 +64,7 @@ export default function Apropos() {
               </div>
               <h3 className="text-xl text-charcoal font-medium mb-3">Excellence</h3>
               <p className="text-text-light text-sm leading-relaxed">
-                Nous sélectionnons rigoureusement chaque matériau et veillons à la perfection de chaque finition.
+                Nous sélectionnons rigoureusement chaque pièce et chaque marque pour garantir la qualité et la satisfaction de nos clientes.
               </p>
             </div>
             <div>
@@ -77,7 +73,7 @@ export default function Apropos() {
               </div>
               <h3 className="text-xl text-charcoal font-medium mb-3">Élégance</h3>
               <p className="text-text-light text-sm leading-relaxed">
-                Des designs intemporels qui traversent les modes et subliment avec raffinement et sobriété.
+                Des sélections intemporelles et raffinées, pensées pour sublimer chaque femme au quotidien.
               </p>
             </div>
             <div>
@@ -86,7 +82,7 @@ export default function Apropos() {
               </div>
               <h3 className="text-xl text-charcoal font-medium mb-3">Éthique</h3>
               <p className="text-text-light text-sm leading-relaxed">
-                Production responsable, artisans équitablement rémunérés, et matières sourcées avec transparence.
+                Nous privilégions des partenaires responsables et des matières sourcées avec transparence, pour une mode plus juste et respectueuse.
               </p>
             </div>
           </div>

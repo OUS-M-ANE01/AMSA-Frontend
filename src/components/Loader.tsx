@@ -5,9 +5,9 @@ export default function Loader() {
         {/* Logo animé */}
         <div className="relative flex flex-col items-center">
   <img
-    src="/AMSA.png"
-    alt="AM'SA Logo"
-    className="h-18 object-contain"
+    src="/ASMA.png"
+    alt="AS'MA Logo"
+    className="h-24 object-contain"
   />
 
   <p className="text-xs text-[#8B8680] tracking-[0.3em] text-center mt-2">

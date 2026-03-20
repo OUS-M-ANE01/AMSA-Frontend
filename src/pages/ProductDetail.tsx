@@ -96,7 +96,7 @@ export default function ProductDetail({
 
       {/* Détails du produit */}
       <section className="px-4 md:px-8 lg:px-14 py-8 md:py-12 bg-warm-white">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto ">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
             {/* Image */}
             <div className="relative">

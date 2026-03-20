@@ -116,7 +116,15 @@ export default function AuthModal({ onClose, onSuccess }: AuthModalProps) {
   };
 
   const handleSocialLogin = (provider: string) => {
-    toast(`Connexion via ${provider} bientôt disponible`, { icon: '🔜' });
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    
+    if (provider === 'Google') {
+      window.location.href = `${API_URL}/auth/google`;
+    } else if (provider === 'Facebook') {
+      window.location.href = `${API_URL}/auth/facebook`;
+    } else if (provider === 'Apple') {
+      toast('Connexion Apple bientôt disponible', { icon: '🍎' });
+    }
   };
 
   const eyeBtn = (
@@ -154,7 +162,7 @@ export default function AuthModal({ onClose, onSuccess }: AuthModalProps) {
           style={{ background: 'linear-gradient(135deg, #1A1A18 0%, #3A2F25 60%, #8C7B6B 100%)' }}
         >
           <div>
-            <p className="text-gold text-[9px] uppercase tracking-[0.35em] font-medium">ASMA</p>
+            <p className="text-gold text-[9px] uppercase tracking-[0.35em] font-medium">AS'MA</p>
             <h2 className="font-serif text-lg font-light leading-tight">
               {mode === 'login' ? 'Connexion' : 'Créer un compte'}
             </h2>
@@ -250,7 +258,7 @@ export default function AuthModal({ onClose, onSuccess }: AuthModalProps) {
           className={`absolute inset-y-0 left-0 w-1/2 flex flex-col justify-center px-10 py-8 transition-opacity duration-500
             ${mode === 'login' ? 'opacity-100 pointer-events-auto z-[1]' : 'opacity-0 pointer-events-none z-0'}`}
         >
-          <p className="text-gold text-[10px] uppercase tracking-[0.3em] font-medium mb-1">ASMA</p>
+          <p className="text-gold text-[10px] uppercase tracking-[0.3em] font-medium mb-1">AS'MA</p>
           <h2 className="font-serif text-[1.75rem] text-charcoal mb-1 font-light">Connexion</h2>
           <p className="text-[#B5AFA8] text-xs mb-5 tracking-wide">Accédez à votre espace personnel</p>
 
@@ -283,9 +291,9 @@ export default function AuthModal({ onClose, onSuccess }: AuthModalProps) {
           className={`absolute inset-y-0 right-0 w-1/2 flex flex-col justify-center px-10 py-8 transition-opacity duration-500
             ${mode === 'register' ? 'opacity-100 pointer-events-auto z-[1]' : 'opacity-0 pointer-events-none z-0'}`}
         >
-          <p className="text-gold text-[10px] uppercase tracking-[0.3em] font-medium mb-1">ASMA</p>
+          <p className="text-gold text-[10px] uppercase tracking-[0.3em] font-medium mb-1">AS'MA</p>
           <h2 className="font-serif text-[1.75rem] text-charcoal mb-1 font-light">Créer un compte</h2>
-          <p className="text-[#B5AFA8] text-xs mb-4 tracking-wide">Rejoignez la communauté ASMA</p>
+          <p className="text-[#B5AFA8] text-xs mb-4 tracking-wide">Rejoignez la communauté AS'MA</p>
 
           <div className="space-y-2 mb-1">
             <SocialBtn icon={<GoogleIcon />} label="Continuer avec Google" onClick={() => handleSocialLogin('Google')} />
@@ -336,7 +344,7 @@ export default function AuthModal({ onClose, onSuccess }: AuthModalProps) {
           <div className="relative z-10 text-center px-4">
             <div className="mb-6">
               <div className="w-10 h-0.5 bg-gold mx-auto mb-3" />
-              <p className="text-gold text-[11px] uppercase tracking-[0.4em] font-medium">ASMA</p>
+              <p className="text-gold text-[11px] uppercase tracking-[0.4em] font-medium">AS'MA</p>
               <div className="w-10 h-0.5 bg-gold mx-auto mt-3" />
             </div>
             <h3 className="font-serif text-2xl font-light leading-snug mb-4 text-white">

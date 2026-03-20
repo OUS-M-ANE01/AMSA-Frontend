@@ -6,6 +6,7 @@ import Banner from '../components/sections/Banner';
 import JewelryProducts from '../components/sections/JewelryProducts';
 import Testimonials from '../components/sections/Testimonials';
 import Instagram from '../components/sections/Instagram';
+import SectionBanner from '../components/sections/SectionBanner';
 import Newsletter from '../components/sections/Newsletter';
 import WhatsAppPopup from '../components/WhatsAppPopup';
 
@@ -37,6 +38,7 @@ export default function Home({ onNavigate, onAddToCart, onToggleFavorite, favori
       />
       <Testimonials />
       <Instagram />
+      <SectionBanner />
       <Newsletter />
       <WhatsAppPopup />
     </>

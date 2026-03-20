@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-8 md:gap-10 lg:gap-14 mb-10 md:mb-14">
         <div>
           <a href="#" className="flex items-center gap-3 font-serif text-[26px] font-semibold tracking-wider text-white inline-block mb-4">
-            <img src="/AMSA-N.png" alt="ASMA Logo" className="w-24 h-24 object-contain mr-2" />
+            <img src="/ASMA-N.png" alt="ASMA Logo" className="w-24 h-24 object-contain mr-2" />
           </a>
           <p className="text-[13px] leading-relaxed max-w-[260px]">
             Boutique mode & bijoux pour femmes modernes. Élégance, qualité et personnalité.
@@ -71,7 +71,7 @@ export default function Footer() {
 
       <div className="border-t border-white/8 pt-6 md:pt-7 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
         <div className="flex items-center gap-4">
-          <span>© 2026 ASMA by OUS_M_ANE. Tous droits réservés.</span>
+          <span>© 2026 AS'MA by OUS_M_ANE. Tous droits réservés.</span>
           
         </div>
         <div className="flex gap-2 md:gap-2.5 items-center flex-wrap justify-center">

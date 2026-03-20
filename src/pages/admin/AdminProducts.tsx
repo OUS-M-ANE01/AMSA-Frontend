@@ -57,7 +57,7 @@ export default function AdminProducts() {
     category: '',
     description: '',
     stock: 0,
-    badge: ''
+    badge: null
   });
 
   // Filtrage client-side
@@ -108,7 +108,7 @@ export default function AdminProducts() {
       category: '',
       description: '',
       stock: 0,
-      badge: ''
+      badge: null
     });
     setShowFormModal(true);
   };
@@ -125,7 +125,7 @@ export default function AdminProducts() {
       category: typeof product.category === 'string' ? product.category : product.category?._id || '',
       description: product.description || '',
       stock: product.stock,
-      badge: product.badge || ''
+      badge: product.badge || null
     });
     setShowFormModal(true);
   };
@@ -141,7 +141,7 @@ export default function AdminProducts() {
     const isCurrentlySale = saleTarget.badge === 'sale';
     try {
       const updatePayload = isCurrentlySale
-        ? { badge: '', oldPrice: undefined }
+        ? { badge: null, oldPrice: null }
         : { badge: 'sale', oldPrice: saleData.oldPrice, price: saleData.price };
       const response = await productsAPI.update(saleTarget._id, updatePayload);
       updateInStore(saleTarget._id, response.data.data);
@@ -172,7 +172,7 @@ export default function AdminProducts() {
 
     const productData = {
       ...formData,
-      badge: formData.badge || undefined,
+      badge: formData.badge || null,
       oldPrice: formData.oldPrice || undefined
     };
 
@@ -201,7 +201,7 @@ export default function AdminProducts() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-0">
       <Toaster position="top-right" />
       
       {/* Header */}
@@ -629,9 +629,9 @@ export default function AdminProducts() {
                       <div className="grid grid-cols-4 gap-2">
                         <button
                           type="button"
-                          onClick={() => setFormData({...formData, badge: ''})}
+                          onClick={() => setFormData({...formData, badge: null})}
                           className={`px-4 py-2.5 rounded-lg border transition-all ${
-                            formData.badge === '' 
+                            !formData.badge 
                               ? 'border-[#8B7355] bg-[#8B7355]/10 text-[#8B7355] font-medium' 
                               : 'border-[#D4C4B0] hover:border-[#8B7355]'
                           }`}
@@ -729,7 +729,7 @@ export default function AdminProducts() {
                 <X size={24} className="text-[#6B6B6B]" />
               </button>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-0">
               <div className="flex gap-6">
                 <img src={selectedProduct.image} alt={selectedProduct.name} className="w-48 h-48 object-cover rounded-lg" />
                 <div className="flex-1 space-y-3">
