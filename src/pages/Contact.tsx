@@ -95,7 +95,7 @@ export default function Contact() {
                   <Phone className="w-5 h-5 text-gold mt-1" />
                   <div>
                     <h3 className="text-charcoal font-medium mb-1">Téléphone</h3>
-                    <p className="text-text-light text-sm">+221 78 116 67 20</p>
+                    <p className="text-text-light text-sm">+221  787 96 51 32</p>
                   </div>
                 </div>
                 
@@ -103,7 +103,7 @@ export default function Contact() {
                   <Mail className="w-5 h-5 text-gold mt-1" />
                   <div>
                     <h3 className="text-charcoal font-medium mb-1">Email</h3>
-                    <p className="text-text-light text-sm">contact@asma.com</p>
+                    <p className="text-text-light text-sm">amsa180525@gmail.com</p>
                   </div>
                 </div>
                 
@@ -129,7 +129,7 @@ export default function Contact() {
                   Pour une réponse immédiate, contactez-nous sur WhatsApp
                 </p>
                 <a
-                  href="https://wa.me/221781166720?text=Bonjour,%20j'aimerais%20avoir%20des%20informations"
+                  href="https://wa.me/221787965132?text=Bonjour,%20j'aimerais%20avoir%20des%20informations"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm font-medium"
