@@ -37,7 +37,7 @@ export const featuredProducts: Product[] = [
   {
     id: 1,
     name: 'Robe Florale Midi',
-    brand: 'EvaStyl',
+      brand: "AS'MA",
     price: 58000,
     image: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=533&fit=crop',
     category: 'robes',
@@ -46,7 +46,7 @@ export const featuredProducts: Product[] = [
   {
     id: 2,
     name: 'Collier Doré Perles',
-    brand: 'Bijoux',
+      brand: "AS'MA",
     price: 35000,
     oldPrice: 47000,
     image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=533&fit=crop',
@@ -55,7 +55,7 @@ export const featuredProducts: Product[] = [
   {
     id: 3,
     name: 'Blouse Satin Ivoire',
-    brand: 'EvaStyl',
+    brand: "AS'MA",
     price: 42000,
     oldPrice: 52000,
     image: 'https://images.unsplash.com/photo-1572804013427-4d7ca7268217?w=400&h=533&fit=crop',
@@ -65,7 +65,7 @@ export const featuredProducts: Product[] = [
   {
     id: 4,
     name: 'Bracelet Chaîne Or',
-    brand: 'Bijoux',
+      brand: "AS'MA",
     price: 25000,
     image: 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=400&h=533&fit=crop',
     category: 'bijoux',
@@ -73,8 +73,8 @@ export const featuredProducts: Product[] = [
   },
   {
     id: 9,
-    name: 'Jupe Plissée Midi',
-    brand: 'EvaStyl',
+    name: 'Jupe Plissée',
+    brand: "AS'MA",
     price: 47000,
     image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=533&fit=crop',
     category: 'jupes',
@@ -83,7 +83,7 @@ export const featuredProducts: Product[] = [
   {
     id: 10,
     name: 'Pantalon Large Lin',
-    brand: 'EvaStyl',
+      brand: "AS'MA",
     price: 55000,
     image: 'https://images.unsplash.com/photo-1594633313593-bab3825d0caf?w=400&h=533&fit=crop',
     category: 'pantalons'
@@ -101,7 +101,7 @@ export const featuredProducts: Product[] = [
   {
     id: 12,
     name: 'Manteau Long Camel',
-    brand: 'EvaStyl',
+    brand: "AS'MA",
     price: 118000,
     image: 'https://images.unsplash.com/photo-1548624313-0396c75e4b1a?w=400&h=533&fit=crop',
     category: 'manteaux'

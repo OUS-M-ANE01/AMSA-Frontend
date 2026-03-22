@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { X, Mail, Lock, User, Phone, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
+import { signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider, facebookProvider } from '../config/firebase';
 
 interface AuthModalProps {
   onClose: () => void;
@@ -49,12 +51,15 @@ function Field({
 }
 
 /* ── Bouton social ── */
-function SocialBtn({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
+function SocialBtn({ icon, label }: { icon: React.ReactNode; label: string; onClick: () => void }) {
   return (
     <button
       type="button"
-      onClick={onClick}
-      className="flex items-center justify-center gap-2 w-full py-2.5 bg-warm-white border border-border rounded-lg text-xs text-charcoal font-medium hover:border-gold hover:bg-gold/5 transition-all duration-200"
+      onClick={() => {}}
+      className="flex items-center justify-center gap-2 w-full py-2.5 bg-gray-200 border border-border rounded-lg text-xs text-gray-400 font-medium cursor-not-allowed opacity-60"
+      disabled
+      aria-disabled="true"
+      tabIndex={-1}
     >
       {icon}
       {label}
@@ -62,16 +67,20 @@ function SocialBtn({ icon, label, onClick }: { icon: React.ReactNode; label: str
   );
 }
 
+
 export default function AuthModal({ onClose, onSuccess }: AuthModalProps) {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { login, register } = useAuth();
+  const { login } = useAuth();
 
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [registerData, setRegisterData] = useState({
     prenom: '', nom: '', email: '', password: '', telephone: '',
   });
+  const [otpStep, setOtpStep] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [pendingEmail, setPendingEmail] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,33 +108,97 @@ export default function AuthModal({ onClose, onSuccess }: AuthModalProps) {
       return;
     }
     setLoading(true);
-    const result = await register(registerData);
-    setLoading(false);
-    if (result.success) {
-      toast.success(`Bienvenue ${result.user?.prenom || ''} !`);
-      // Redirection selon le rôle
-      if (result.user?.role === 'admin') {
-        window.location.hash = 'admin-dashboard';
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(registerData),
+      });
+      const data = await response.json();
+      setLoading(false);
+      if (data.success && data.data?.status === 'pending_verification') {
+        setOtpStep(true);
+        setPendingEmail(registerData.email);
+        toast.success('Un code a été envoyé à votre email.');
+      } else if (data.success) {
+        toast.success(`Bienvenue ${data.data.user?.prenom || ''} !`);
+        onSuccess();
+        onClose();
       } else {
-        window.location.hash = 'profil';
+        toast.error(data.errors?.[0]?.msg || data.message || "Erreur lors de l'inscription");
       }
-      onSuccess();
-    } else {
-      toast.error(result.error || "Erreur lors de l'inscription");
+    } catch (error: any) {
+      setLoading(false);
+      toast.error(error?.message || "Erreur lors de l'inscription");
     }
   };
 
-  const handleSocialLogin = (provider: string) => {
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-    
-    if (provider === 'Google') {
-      window.location.href = `${API_URL}/auth/google`;
-    } else if (provider === 'Facebook') {
-      window.location.href = `${API_URL}/auth/facebook`;
-    } else if (provider === 'Apple') {
-      toast('Connexion Apple bientôt disponible', { icon: '🍎' });
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/verify-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: pendingEmail, otp }),
+      });
+      const data = await response.json();
+      setLoading(false);
+      if (data.success) {
+        toast.success('Email vérifié, vous pouvez vous connecter !');
+        setOtpStep(false);
+        setMode('login');
+      } else {
+        toast.error(data.message || 'Code incorrect ou expiré');
+      }
+    } catch (error: any) {
+      setLoading(false);
+      toast.error(error?.message || 'Erreur lors de la vérification');
     }
   };
+
+  const handleSocialLogin = async (provider: string) => {
+  try {
+    let result;
+    
+    if (provider === 'Google') {
+      result = await signInWithPopup(auth, googleProvider);
+    } else if (provider === 'Facebook') {
+      result = await signInWithPopup(auth, facebookProvider);
+    } else {
+      return;
+    }
+    
+    // Récupère le token Firebase
+    const token = await result.user.getIdToken();
+    
+    // Envoie le token au backend
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const response = await fetch(`${API_URL}/auth/firebase`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token }),
+    });
+    
+    const data = await response.json();
+    
+    if (data.success && data.token) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      toast.success(`Connexion ${provider} réussie !`);
+      onSuccess?.();
+      onClose();
+    } else {
+      toast.error(data.message || 'Erreur de connexion');
+    }
+  } catch (error: any) {
+    console.error(`Erreur connexion ${provider}:`, error);
+    toast.error(error.message || `Erreur de connexion avec ${provider}`);
+  }
+};
+
 
   const eyeBtn = (
     <button
@@ -305,27 +378,66 @@ export default function AuthModal({ onClose, onSuccess }: AuthModalProps) {
 
           <Divider />
 
-          <form onSubmit={handleRegister} className="space-y-2.5">
-            <div className="grid grid-cols-2 gap-2.5">
-              <Field icon={User} type="text" required placeholder="Prénom"
-                value={registerData.prenom} onChange={e => setRegisterData({ ...registerData, prenom: e.target.value })} />
-              <input type="text" required placeholder="Nom" value={registerData.nom}
-                onChange={e => setRegisterData({ ...registerData, nom: e.target.value })}
-                className="w-full px-3 py-2.5 bg-cream border border-border rounded-lg text-sm text-charcoal placeholder-[#B5AFA8] focus:outline-none focus:border-gold transition-colors" />
-            </div>
-            <Field icon={Mail} type="email" required placeholder="Email"
-              value={registerData.email} onChange={e => setRegisterData({ ...registerData, email: e.target.value })} />
-            <Field icon={Phone} type="tel" placeholder="+221 77 000 00 00"
-              value={registerData.telephone} onChange={e => setRegisterData({ ...registerData, telephone: e.target.value })} />
-            <Field icon={Lock} type={showPassword ? 'text' : 'password'} required placeholder="Mot de passe (min. 8 caractères)"
-              value={registerData.password} onChange={e => setRegisterData({ ...registerData, password: e.target.value })}
-              right={eyeBtn} />
-            <button type="submit" disabled={loading}
-              className="w-full bg-charcoal hover:bg-gold text-white text-[11px] font-semibold uppercase tracking-widest py-3 rounded-lg transition-all duration-300 flex items-center justify-center gap-2">
-              {loading && <Loader2 size={14} className="animate-spin" />}
-              {loading ? 'Création…' : 'Créer mon compte'}
-            </button>
-          </form>
+          {!otpStep ? (
+            <form onSubmit={handleRegister} className="space-y-2.5">
+              <div className="grid grid-cols-2 gap-2.5">
+                <Field icon={User} type="text" required placeholder="Prénom"
+                  value={registerData.prenom} onChange={e => setRegisterData({ ...registerData, prenom: e.target.value })} />
+                <input type="text" required placeholder="Nom" value={registerData.nom}
+                  onChange={e => setRegisterData({ ...registerData, nom: e.target.value })}
+                  className="w-full px-3 py-2.5 bg-cream border border-border rounded-lg text-sm text-charcoal placeholder-[#B5AFA8] focus:outline-none focus:border-gold transition-colors" />
+              </div>
+              <Field icon={Mail} type="email" required placeholder="Email"
+                value={registerData.email} onChange={e => setRegisterData({ ...registerData, email: e.target.value })} />
+              <Field icon={Phone} type="tel" placeholder="+221 77 000 00 00"
+                value={registerData.telephone} onChange={e => setRegisterData({ ...registerData, telephone: e.target.value })} />
+              <Field icon={Lock} type={showPassword ? 'text' : 'password'} required placeholder="Mot de passe (min. 8 caractères)"
+                value={registerData.password} onChange={e => setRegisterData({ ...registerData, password: e.target.value })}
+                right={eyeBtn} />
+              <button type="submit" disabled={loading}
+                className="w-full bg-charcoal hover:bg-gold text-white text-[11px] font-semibold uppercase tracking-widest py-3 rounded-lg transition-all duration-300 flex items-center justify-center gap-2">
+                {loading && <Loader2 size={14} className="animate-spin" />}
+                {loading ? 'Création…' : 'Créer mon compte'}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleVerifyOtp} className="space-y-2.5">
+              <div className="mb-2 text-sm text-[#8B7355]">Un code de vérification a été envoyé à <b>{pendingEmail}</b>. Entrez-le ci-dessous :</div>
+              <Field icon={Mail} type="text" required placeholder="Code reçu par email" value={otp} onChange={e => setOtp(e.target.value)} maxLength={6} />
+              <div className="flex gap-2">
+                <button type="submit" disabled={loading}
+                  className="flex-1 bg-charcoal hover:bg-gold text-white text-[11px] font-semibold uppercase tracking-widest py-3 rounded-lg transition-all duration-300 flex items-center justify-center gap-2">
+                  {loading && <Loader2 size={14} className="animate-spin" />}
+                  {loading ? 'Vérification…' : 'Valider le code'}
+                </button>
+                <button type="button" disabled={loading}
+                  className="flex-1 bg-gray-200 hover:bg-gold/20 text-charcoal text-[11px] font-semibold uppercase tracking-widest py-3 rounded-lg transition-all duration-300 border border-gold"
+                  onClick={async () => {
+                    if (!pendingEmail) return;
+                    setLoading(true);
+                    try {
+                      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/auth/resend-otp`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: pendingEmail }),
+                      });
+                      const data = await response.json();
+                      setLoading(false);
+                      if (data.success) {
+                        toast.success('Nouveau code envoyé !');
+                      } else {
+                        toast.error(data.message || 'Erreur lors de l\'envoi du code');
+                      }
+                    } catch (error: any) {
+                      setLoading(false);
+                      toast.error(error?.message || 'Erreur lors de l\'envoi du code');
+                    }
+                  }}>
+                  Renvoyer le code
+                </button>
+              </div>
+            </form>
+          )}
         </div>
 
         {/* PANNEAU GLISSANT — login → droite, register → gauche */}

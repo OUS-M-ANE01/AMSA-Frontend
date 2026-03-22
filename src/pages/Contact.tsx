@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Mail, Phone, MapPin, Clock, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
-import api from '../services/api';
+import { adminAPI } from '../services/api';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -30,7 +30,7 @@ export default function Contact() {
     setSuccess(false);
 
     try {
-      await api.sendContactMessage(formData);
+      await adminAPI.sendContactMessage(formData);
       setSuccess(true);
       setFormData({
         prenom: '',
@@ -103,7 +103,7 @@ export default function Contact() {
                   <Mail className="w-5 h-5 text-gold mt-1" />
                   <div>
                     <h3 className="text-charcoal font-medium mb-1">Email</h3>
-                    <p className="text-text-light text-sm">contact@evastyl.com</p>
+                    <p className="text-text-light text-sm">contact@asma.com</p>
                   </div>
                 </div>
                 

@@ -141,7 +141,7 @@ export default function AdminLogin({ onNavigate }: AdminLoginProps) {
           {/* Logo */}
           <div className="flex justify-center mb-4 z-index-1">
             <img 
-              src="/logo_evastyl.png" 
+              src="/logo_asma.png" 
               alt="ASMA Logo" 
               className="h-24 w-auto"
             />

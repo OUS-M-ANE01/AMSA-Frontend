@@ -28,7 +28,7 @@ interface ProductForm {
   category: string;
   description: string;
   stock: number;
-  badge?: 'new' | 'sale' | 'bestseller' | '';
+  badge?: 'new' | 'sale' | 'bestseller' | '' | undefined;
 }
 
 export default function AdminProducts() {
@@ -57,7 +57,7 @@ export default function AdminProducts() {
     category: '',
     description: '',
     stock: 0,
-    badge: null
+    badge: undefined
   });
 
   // Filtrage client-side
@@ -108,7 +108,7 @@ export default function AdminProducts() {
       category: '',
       description: '',
       stock: 0,
-      badge: null
+      badge: undefined
     });
     setShowFormModal(true);
   };
@@ -125,7 +125,7 @@ export default function AdminProducts() {
       category: typeof product.category === 'string' ? product.category : product.category?._id || '',
       description: product.description || '',
       stock: product.stock,
-      badge: product.badge || null
+      badge: product.badge ?? undefined
     });
     setShowFormModal(true);
   };
@@ -629,7 +629,7 @@ export default function AdminProducts() {
                       <div className="grid grid-cols-4 gap-2">
                         <button
                           type="button"
-                          onClick={() => setFormData({...formData, badge: null})}
+                          onClick={() => setFormData({...formData, badge: undefined})}
                           className={`px-4 py-2.5 rounded-lg border transition-all ${
                             !formData.badge 
                               ? 'border-[#8B7355] bg-[#8B7355]/10 text-[#8B7355] font-medium' 

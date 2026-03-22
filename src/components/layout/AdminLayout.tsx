@@ -12,8 +12,7 @@ import {
   Search,
   Home,
   Tag,
-  Image,
-  Mail,
+    Mail,
 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import toast from "react-hot-toast";

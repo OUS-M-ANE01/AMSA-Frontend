@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { ordersAPI } from '../services/api';
 import toast, { Toaster } from 'react-hot-toast';
+import PasswordChangeForm from './PasswordChangeForm';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: any }> = {
   confirmed: { label: 'Confirmée', color: 'text-emerald-700', bg: 'bg-emerald-50 border border-emerald-200', icon: CheckCircle },
@@ -10,6 +11,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
   cancelled: { label: 'Annulée',   color: 'text-red-700',    bg: 'bg-red-50 border border-red-200',        icon: XCircle },
   delivered: { label: 'Livrée',    color: 'text-blue-700',   bg: 'bg-blue-50 border border-blue-200',      icon: CheckCircle },
 };
+
 
 function StatCard({ icon: Icon, label, value, sub }: { icon: any; label: string; value: string | number; sub?: string }) {
   return (
@@ -329,6 +331,18 @@ export default function Profil() {
                 {user.telephone && (
                   <span className="flex items-center gap-1 text-[#a8883c] text-xs sm:text-sm">
                     <Phone size={12} className="shrink-0" /> {user.telephone}
+                              <div className="mt-6 flex flex-col gap-2">
+                                <button
+                                  onClick={() => {}}
+                                  className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-gray-200 border border-[#e8e2d9] text-gray-400 font-medium cursor-not-allowed opacity-60"
+                                  disabled
+                                  aria-disabled="true"
+                                  tabIndex={-1}
+                                >
+                                  <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" className="w-5 h-5" />
+                                  Se connecter avec Google
+                                </button>
+                              </div>
                   </span>
                 )}
               </div>
@@ -502,18 +516,7 @@ export default function Profil() {
                 <h3 className="font-serif text-[#2C2C2C] font-semibold">Sécurité du compte</h3>
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-[#faf8f5] border border-[#e8e2d9] rounded-xl">
-                <div>
-                  <p className="text-sm font-medium text-[#2C2C2C]">Mot de passe</p>
-                  <p className="text-xs text-[#8B7355] mt-0.5">••••••••••••</p>
-                </div>
-                <button
-                  onClick={() => toast('Fonctionnalité bientôt disponible', { icon: '🔒' })}
-                  className="px-4 py-2 rounded-lg border border-[#C9A84C] text-[#C9A84C] text-xs font-medium hover:bg-[#C9A84C] hover:text-white transition-all"
-                >
-                  Modifier
-                </button>
-              </div>
+              <PasswordChangeForm />
             </div>
 
             {/* Danger zone */}

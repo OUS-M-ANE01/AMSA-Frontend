@@ -22,7 +22,7 @@ const FIXED_PAGES = [
   { value: 'bijoux', label: 'Bijoux', defaultTitle: 'Bijoux Élégants', defaultSubtitle: 'Pièces Uniques' },
   { value: 'vetements', label: 'Vêtements', defaultTitle: 'Collection Vêtements', defaultSubtitle: 'Nouvelle Saison' },
   { value: 'contact', label: 'Contact', defaultTitle: 'Contactez-Nous', defaultSubtitle: 'Nous Sommes À Votre Écoute' },
-  { value: 'apropos', label: 'À Propos', defaultTitle: "À Propos d'EvaStyl", defaultSubtitle: 'Notre Histoire' },
+  { value: 'apropos', label: 'À Propos', defaultTitle: "À Propos d'AS'MA", defaultSubtitle: 'Notre Histoire' },
 ];
 
 export default function PageBannersTab() {

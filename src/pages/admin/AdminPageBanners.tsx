@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Image, Save, RefreshCw, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Save, RefreshCw, Eye, EyeOff, Loader2 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 
